@@ -4,6 +4,12 @@ const User = require('../models/UserModel')
 var checkUserAuth = async (req, res, next) => {
     let token
 
+    if(!token){
+        res.send({success: false,message :"Token not found"})
+        return
+    }
+
+
     const {authorization} = req.headers
     if(authorization && authorization?.startsWith('Bearer')){
         try{
@@ -18,15 +24,11 @@ var checkUserAuth = async (req, res, next) => {
             next()
 
         }catch(err){
-            res.send({"status": "Failed","message" :"UnAuthorized access"})
+            res.send({success: false,message :"UnAuthorized access"})
         }
     }
 
-    if(!token){
-        res.send({"status": "Failed","message" :"Please add the token into your header"})
-
-    }
-
+ 
 } 
 
 

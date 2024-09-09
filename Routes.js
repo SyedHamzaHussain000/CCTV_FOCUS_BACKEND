@@ -11,10 +11,6 @@ const AuthController = require("./controller/AuthController");
 const MainController = require("./controller/MainController");
 
 
-
-
-
-
 //Upload Image
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -27,7 +23,7 @@ const upload = multer({
 
 
 //middleware routes
-Route.use("Post_Alarm_Instruction", checkUserAuth)
+Route.use("/Post_Alarm_Instruction", checkUserAuth)
 
 
 
