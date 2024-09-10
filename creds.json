@@ -1,0 +1,10 @@
+{
+  "web": {
+    "client_id": "112581027895-l40pjpjos320qrliov0ujmctbkca8n9c.apps.googleusercontent.com",
+    "project_id": "cctv-focus",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_secret": "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"
+  }
+}

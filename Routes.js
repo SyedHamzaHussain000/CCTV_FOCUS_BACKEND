@@ -9,7 +9,7 @@ const checkUserAuth = require("./middleware/Auth_MiddleWare");
 //Controllers
 const AuthController = require("./controller/AuthController");
 const MainController = require("./controller/MainController");
-
+const GoogleSheetController = require("./controller/GoogleSheet");
 
 //Upload Image
 const upload = multer({
@@ -25,7 +25,8 @@ const upload = multer({
 //middleware routes
 Route.use("/Post_Alarm_Instruction", checkUserAuth)
 
-
+//sheet to db
+Route.get("/getSpreed",  GoogleSheetController.getSpreed);
 
 //Authentication routes
 Route.post("/Register", AuthController.Register);
@@ -33,7 +34,6 @@ Route.post("/Login", AuthController.Login);
 Route.post("/sendUserPasswordEmail", AuthController.sendUserPasswordEmail);
 Route.post("/VerifyOtp", AuthController.VerifyOtp);
 Route.post("/resetForgetPassword", AuthController.resetForgetPassword);
-
 
 
 //Main routes
@@ -46,5 +46,7 @@ Route.post(
   ]),
   MainController.Post_Alarm_Instruction
 );
+
+Route.post("/getCamera",MainController.getCamera);
 
 module.exports = Route;

@@ -1,6 +1,7 @@
 const cloudinary = require('cloudinary');
 const path = require('path');
-const AlarmModal = require('../models/AlarmModel')
+const AlarmModal = require('../models/AlarmModel');
+const Camera_Modal = require('../models/CameraAndRecorder_Data/CameraModel');
  // Configure Cloudinary
  cloudinary.v2.config({
    cloud_name: process.env.CLOUDINARY_NAME,
@@ -122,6 +123,74 @@ class MainController {
     }
 
   };
+
+
+  static Post_CCTV_Instruction = async (req, res) => {
+    const {
+      full_name,
+      email,
+      phone_number,
+      address,
+      What_Sector,
+      What_Sector_Step_Two,
+      What_Sector_Commercial_Sector,
+      What_Sector_other,
+      What_Sector_Postal_Code,
+      Bedrooms,
+      Area_Of_Concern,
+      Security_System,
+      CCTV_Equipment,
+      Security_Incident,
+      //Add image of camera installation
+      Height_Of_Camera_Installation,
+      Camera_Installation_Brief,
+      //Add image of Recorder installation
+      Height_Of_Recorder_Installation,
+      Recorder_Installation_Brief,
+      Cable_type,
+      Storage_Duration,
+      Fire_Alarm,
+      Security_Light,
+      Smart_lock,
+      Specific_Customization,
+      Follow_Method_email,
+      Follow_Method_phone,
+      Follow_Method_sms,
+
+    } = req.body;
+    
+  }
+
+
+  static getCamera = async(req, res) => {
+    const {Camera_type, Resolution, Additonal_Feature, audio_type, where_to_install} = req.body
+
+    const Dome_Camera = "Bullet Cameras"
+
+    const newCamera = Dome_Camera.split("Cameras")
+
+    console.log("camera is", newCamera[0])
+
+    const Camera = await Camera_Modal.find({
+      RESOLUTION : Resolution,
+      DESCRIPTION: { $regex: newCamera[0], $options: "i" } // Case-insensitive search for the keyword "camera"
+
+    })
+
+    res.send({
+      "success": true,
+      
+      "data": Camera
+    })
+  }
+
+
+  static getRecorder =(req, res) => {
+    const {Camera_type, Resolution, Additonal_Feature, audio_type, where_to_install} = req.body
+
+  }
+
+
 
 
   

@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "cctv-focus",
+  "private_key_id": "46efb47b37bddb5d0cf1b7bc2809aecf660eefdf",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC1A6c+WJ82ZP8a\nA52Y4fUTRXtaXeaDSsz4kQ/ynOT7Si19PNUSX89bCk1zNz9+gzEK9Dbn8u8jUxHp\nzV/8fsRkFiHBwsi5rQhVmL4DroVoOueRlot4qa7UK3a9EpPCToEre1nAFkJriYGp\nDShqtBEs1qux7UygA7tFbp8NL9aPd5wgd1/NwTcEs0vS9s6D5pSxeXzutd1ll+qk\n0ehlGwkjTWcX7VIf9IRJ35tZhC3fe3AM8QD8BZZKC2m/kS4Mz69J1//TFPEd6uNc\nFrWNFcAb29GYYFI8bu2BmMFEOGZtv8A3XANxYLkMOOcA6UOiWijzLwK0wADb9EIv\neTPLrdRNAgMBAAECggEAAQ/9F/qWhKU3HMSkqim5XIbt4GvorHXwmgzlQRFMBBro\nBXIpS1Wl9peAOOA8I9af9RErOVVNs1wLdjSEZGECGhb0f8SllPa/s8Y/vJnLoqml\n2PmUkVK9pJ/Ur0C//ptOBXP7OjYR5xEEN8/MoEO0+MRnIZY4+uogBppNngWH3DO0\nU8vlim8D7w1WqU1KXrwx8UXx96ex9N57CdvR9Ybvy1+UMFs8DiZzMVRoiNkWNczD\nvPpUdNJA5PkkeSCUuTlNrDWdNYPEOdu66j1GEQk7YRCNuJwC2sQVyC8fyTY3ulg5\n7A8Gli8hdbxj9ESvzHjFtREANEX2WJuZoAF9brYXwQKBgQDiiIj/pWTEy2mhxdtk\n9ZDHjyVAfIxF7NtpryRYPvQVTSMnqgvS7obmNUI7CwNH1GXWHnU9aPOfBmMSVl5l\nOHof6qBeToqNWOvua28jdnM20jgyoy/B7uOicqMhxb6UbCTmfDqBdUfgoMzkrFe7\nEWRYmXCZUqvUByJ7yIZL505ARQKBgQDMj1ovk83IQG1ZUeibrJKTz2/OPLPVNeTw\nii5ZkV5rbBmt8nq78TPu+dDuxv3BEmv7RILLroyb8DjnbO8Aaype5Fm8t80dCAUY\n5eF9B5K7ObYtC/7JBQsmf35LaoIRhWgYGXJFSJjcR5V6IKz/JMRyZiOccfC2b0D7\ndi3YOsMYaQKBgDJrx2p3ar1utR0/x7xp+Aai8tyunB44QQH97K4DnRpcp/V9INKb\nKsV0l0BDDEDhoqUM9HVttcPwjP6Y4LvQ3UXbWESFYMtjPmg722neRHiwQ7fpoIie\n3mXa9DphJDEu/OucPP1xmEUEJXbEcWZ+0YHy7SADSaGQ0PkSQeoFGuKtAoGAY8gJ\nVevjFStYK5movUcQuMkW4KL7laUUZ8D/mvEt/XhdjlwZQlQF4Sw6nj6yyNsTkR16\nL6CVNfuXxkt8ydd8c40vuL5vbxnaYqq/sx1elbUxCAgx4Bx1s/G8yUzK5YENpbPD\n6cffyJOidlA6Err8mFD6TfXGVTcvm3mqIy+GuwECgYAUlObU60gdx1B4Mui9tQi8\n1UV44fk49ycW2W+88TbnzlVH79lgK5JEj79iIoRMmpLiDtZrffoVELlmr1+WUK02\nTZLAxiT9MoPTjxsuX+RC/K/PxbP2a1ZwlW4cOiCjaJuZT/nudzsiLjxc/Jq+q5EW\n/8EafnbK+z+MC5OhGeZYRA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "cctvfocus@cctv-focus.iam.gserviceaccount.com",
+  "client_id": "115586212564998668001",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cctvfocus%40cctv-focus.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
