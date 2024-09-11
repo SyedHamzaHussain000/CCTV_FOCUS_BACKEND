@@ -1,35 +1,34 @@
-const cloudinary = require('cloudinary');
-const path = require('path');
-const AlarmModal = require('../models/AlarmModel');
-const Camera_Modal = require('../models/CameraAndRecorder_Data/CameraModel');
- // Configure Cloudinary
- cloudinary.v2.config({
-   cloud_name: process.env.CLOUDINARY_NAME,
-   api_key: process.env.CLOUDINARY_KEY,
-   api_secret: process.env.CLOUDINARY_SECRET,
- });
+const cloudinary = require("cloudinary");
+const path = require("path");
+const AlarmModal = require("../models/AlarmModel");
+const CCTVModal = require("../models/CCTVModel");
+const Camera_Modal = require("../models/CameraAndRecorder_Data/CameraModel");
+const Recorder_Modal = require("../models/CameraAndRecorder_Data/RecorderModel");
+// Configure Cloudinary
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET,
+});
 
-
- //Uploading to Cloudinary 
- const uploadImageToCloudinary = (imageBuffer, publicId) => {
-   return new Promise((resolve, reject) => {
-     const stream = cloudinary.v2.uploader.upload_stream(
-       { public_id: publicId }, 
-       (error, result) => {
-         if (error) {
-           console.error("Cloudinary upload error:", error);
-           return reject(new Error("Image upload failed"));
-         }
-         resolve(result.secure_url); // Return the image URL
-       }
-     );
-     stream.end(imageBuffer);
-   });
- };
-
+//Uploading to Cloudinary
+const uploadImageToCloudinary = (imageBuffer, publicId) => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.v2.uploader.upload_stream(
+      { public_id: publicId },
+      (error, result) => {
+        if (error) {
+          console.error("Cloudinary upload error:", error);
+          return reject(new Error("Image upload failed"));
+        }
+        resolve(result.secure_url); // Return the image URL
+      }
+    );
+    stream.end(imageBuffer);
+  });
+};
 
 class MainController {
-   
   static Post_Alarm_Instruction = async (req, res) => {
     const {
       full_name,
@@ -52,78 +51,93 @@ class MainController {
       Shock_Sensor,
     } = req.body;
 
-
-
     try {
       const imageUrls = {};
-      const { ControlPanel_Image, KeyPad_Image, Matching_CCTV_Image } = req.files;
+      const { ControlPanel_Image, KeyPad_Image, Matching_CCTV_Image } =
+        req.files;
 
       if (ControlPanel_Image) {
-         const fileNameWithoutExtension = path.basename(ControlPanel_Image[0].originalname, path.extname(ControlPanel_Image[0].originalname));
-         imageUrls.ControlPanel_Image = await uploadImageToCloudinary(ControlPanel_Image[0].buffer, `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`);
-       }
- 
-       if (KeyPad_Image) {
-         const fileNameWithoutExtension = path.basename(KeyPad_Image[0].originalname, path.extname(KeyPad_Image[0].originalname));
-         imageUrls.KeyPad_Image = await uploadImageToCloudinary(KeyPad_Image[0].buffer, `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`);
-       }
- 
-       if (Matching_CCTV_Image) {
-         const fileNameWithoutExtension = path.basename(Matching_CCTV_Image[0].originalname, path.extname(Matching_CCTV_Image[0].originalname));
-         imageUrls.Matching_CCTV_Image = await uploadImageToCloudinary(Matching_CCTV_Image[0].buffer, `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`);
-       }
-      
+        const fileNameWithoutExtension = path.basename(
+          ControlPanel_Image[0].originalname,
+          path.extname(ControlPanel_Image[0].originalname)
+        );
+        imageUrls.ControlPanel_Image = await uploadImageToCloudinary(
+          ControlPanel_Image[0].buffer,
+          `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`
+        );
+      }
 
-       const saveAlarmInstruction =  await AlarmModal({
-         full_name : full_name,
-         email : email,
-         phone_number: phone_number,
-         address : address,
-         What_Sector :  What_Sector,
-         What_Sector_Step_Two : What_Sector_Step_Two,
-         PropertySize: PropertySize,
-         No_Of_Floor: No_Of_Floor,
-         Entry_Point : Entry_Point,
-         ControlPanel_Image: imageUrls.ControlPanel_Image,
-         ControlPanel_Location: ControlPanel_Location,
-         ControlPanel_Description: ControlPanel_Description,
-         KeyPad_Image: imageUrls.KeyPad_Image,
-         KeyPad_Location: KeyPad_Location,
-         Siren_Location: Siren_Location,
-         Distance_from_Control_Panel: Distance_from_Control_Panel,
-         Matching_CCTV_Image: imageUrls.Matching_CCTV_Image,
-         Matching_CCTV_Description: Matching_CCTV_Description,
-         Sensors: Sensors,
-         Door_Contacts: Door_Contacts,
-         Shock_Sensor: Shock_Sensor,
-       })
+      if (KeyPad_Image) {
+        const fileNameWithoutExtension = path.basename(
+          KeyPad_Image[0].originalname,
+          path.extname(KeyPad_Image[0].originalname)
+        );
+        imageUrls.KeyPad_Image = await uploadImageToCloudinary(
+          KeyPad_Image[0].buffer,
+          `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`
+        );
+      }
 
-       saveAlarmInstruction.save().then(()=>{
-         res.send({
-            Status: true,
-            Success: "Response",
+      if (Matching_CCTV_Image) {
+        const fileNameWithoutExtension = path.basename(
+          Matching_CCTV_Image[0].originalname,
+          path.extname(Matching_CCTV_Image[0].originalname)
+        );
+        imageUrls.Matching_CCTV_Image = await uploadImageToCloudinary(
+          Matching_CCTV_Image[0].buffer,
+          `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`
+        );
+      }
+
+      const saveAlarmInstruction = await AlarmModal({
+        full_name: full_name,
+        email: email,
+        phone_number: phone_number,
+        address: address,
+        What_Sector: What_Sector,
+        What_Sector_Step_Two: What_Sector_Step_Two,
+        PropertySize: PropertySize,
+        No_Of_Floor: No_Of_Floor,
+        Entry_Point: Entry_Point,
+        ControlPanel_Image: imageUrls.ControlPanel_Image,
+        ControlPanel_Location: ControlPanel_Location,
+        ControlPanel_Description: ControlPanel_Description,
+        KeyPad_Image: imageUrls.KeyPad_Image,
+        KeyPad_Location: KeyPad_Location,
+        Siren_Location: Siren_Location,
+        Distance_from_Control_Panel: Distance_from_Control_Panel,
+        Matching_CCTV_Image: imageUrls.Matching_CCTV_Image,
+        Matching_CCTV_Description: Matching_CCTV_Description,
+        Sensors: Sensors,
+        Door_Contacts: Door_Contacts,
+        Shock_Sensor: Shock_Sensor,
+      });
+
+      saveAlarmInstruction
+        .save()
+        .then(() => {
+          res.send({
+            success: true,
+            message: "Successfully Alarm Created",
             data: saveAlarmInstruction,
           });
-          }).catch((e)=>{
-            res.send({
-               Status: false,
-               Success: "Response",
-               data: saveAlarmInstruction,
-             });
-          })
-     // Send the response with the uploaded image URLs
-     
+        })
+        .catch((e) => {
+          res.send({
+            success: false,
+            message: e.message,
+          });
+        });
+      // Send the response with the uploaded image URLs
     } catch (error) {
       console.error("Error during image upload:", error.message);
       res.status(500).send({
-        Status: false,
+        success: false,
         Error: "Image upload failed",
         Message: error.message,
       });
     }
-
   };
-
 
   static Post_CCTV_Instruction = async (req, res) => {
     const {
@@ -133,67 +147,163 @@ class MainController {
       address,
       What_Sector,
       What_Sector_Step_Two,
-      What_Sector_Commercial_Sector,
-      What_Sector_other,
-      What_Sector_Postal_Code,
-      Bedrooms,
-      Area_Of_Concern,
+      What_Comercial_Sector,
+      What_Comercial_Other_Info,
+      What_Comercial_Postal_Code,
+      BedRooms,
+      Purpose_Of_Installment,
+      Area_of_Concern,
       Security_System,
       CCTV_Equipment,
       Security_Incident,
-      //Add image of camera installation
-      Height_Of_Camera_Installation,
-      Camera_Installation_Brief,
-      //Add image of Recorder installation
-      Height_Of_Recorder_Installation,
-      Recorder_Installation_Brief,
+      Camera,
+      Camera_Heigh_Of_Installation_Text,
+      Camera_Heigh_Of_Installation_Desc,
+      Recorder,
+      Recorder_Heigh_Of_Installation_Text,
+      Recorder_Heigh_Of_Installation_Desc,
       Cable_type,
+      Cable_Length,
       Storage_Duration,
-      Fire_Alarm,
-      Security_Light,
-      Smart_lock,
-      Specific_Customization,
+      FireAlarm,
+      Smart_Lock,
+      Security_Lighting,
+      Special_Requirement,
       Follow_Method_email,
       Follow_Method_phone,
       Follow_Method_sms,
-
     } = req.body;
-    
-  }
 
 
-  static getCamera = async(req, res) => {
-    const {Camera_type, Resolution, Additonal_Feature, audio_type, where_to_install} = req.body
+    try {
+      let imageUrls = {};
+      const {
+        Camera_Heigh_Of_Installation_Picture,
+        Recorder_Heigh_Of_Installation_Picture,
+      } = req.files;
 
-    const Dome_Camera = "Bullet Cameras"
+      if (Camera_Heigh_Of_Installation_Picture) {
+        const fileNameWithoutExtension = path.basename(
+          Camera_Heigh_Of_Installation_Picture[0].originalname,
+          path.extname(Camera_Heigh_Of_Installation_Picture[0].originalname)
+        );
+        imageUrls.Camera_Heigh_Of_Installation_Picture =
+          await uploadImageToCloudinary(
+            Camera_Heigh_Of_Installation_Picture[0].buffer,
+            `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`
+          );
+      }
 
-    const newCamera = Dome_Camera.split("Cameras")
+      if (Recorder_Heigh_Of_Installation_Picture) {
+        const fileNameWithoutExtension = path.basename(
+          Recorder_Heigh_Of_Installation_Picture[0].originalname,
+          path.extname(Recorder_Heigh_Of_Installation_Picture[0].originalname)
+        );
+        imageUrls.Recorder_Heigh_Of_Installation_Picture =
+          await uploadImageToCloudinary(
+            Recorder_Heigh_Of_Installation_Picture[0].buffer,
+            `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`
+          );
+      }
 
-    console.log("camera is", newCamera[0])
+      const saveCCTV_Instruction = await CCTVModal({
+        full_name: full_name,
+        email: email,
+        phone_number: phone_number,
+        address: address,
+        What_Sector: What_Sector,
+        What_Sector_Step_Two: What_Sector_Step_Two,
+        What_Comercial_Sector: What_Comercial_Sector,
+        What_Comercial_Other_Info: What_Comercial_Other_Info,
+        What_Comercial_Postal_Code: What_Comercial_Postal_Code,
+        BedRooms: BedRooms,
+        Purpose_Of_Installment: Purpose_Of_Installment,
+        Area_of_Concern: Area_of_Concern,
+        Security_System: Security_System,
+        CCTV_Equipment: CCTV_Equipment,
+        Security_Incident: Security_Incident,
+        Camera: JSON.parse(Camera),
+        //Add image of camera installation
+        Camera_Heigh_Of_Installation_Picture:
+          imageUrls.Camera_Heigh_Of_Installation_Picture,
+        Camera_Heigh_Of_Installation_Text: Camera_Heigh_Of_Installation_Text,
+        Camera_Heigh_Of_Installation_Desc: Camera_Heigh_Of_Installation_Desc,
+        Recorder: JSON.parse(Recorder),
+        //Add image of Recorder installation
+        Recorder_Heigh_Of_Installation_Picture:
+          imageUrls.Recorder_Heigh_Of_Installation_Picture,
+        Recorder_Heigh_Of_Installation_Text:
+          Recorder_Heigh_Of_Installation_Text,
+        Recorder_Heigh_Of_Installation_Desc:
+          Recorder_Heigh_Of_Installation_Desc,
+        Cable_type: Cable_type,
+        Cable_Length: Cable_Length,
+        Storage_Duration: Storage_Duration,
+        FireAlarm: FireAlarm,
+        Smart_Lock: Smart_Lock,
+        Security_Lighting: Security_Lighting,
+        Special_Requirement: Special_Requirement,
+        Follow_Method_email: Follow_Method_email,
+        Follow_Method_phone: Follow_Method_phone,
+        Follow_Method_sms: Follow_Method_sms,
+      });
+
+      saveCCTV_Instruction
+        .save()
+        .then(() => {
+          res.send({
+            success: true,
+            message: "Successfully CCTV Created",
+            data: saveCCTV_Instruction,
+          });
+        })
+        .catch((e) => {
+          res.send({
+            success: false,
+            message: e.message,
+          });
+        });
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
+
+  static getCamera = async (req, res) => {
+    const {
+      Camera_type,
+      Resolution,
+      Additonal_Feature,
+      audio_type,
+      where_to_install,
+    } = req.body;
+
+    const Dome_Camera = Camera_type;
+    const newCamera = Dome_Camera.split("Cameras");
 
     const Camera = await Camera_Modal.find({
-      RESOLUTION : Resolution,
-      DESCRIPTION: { $regex: newCamera[0], $options: "i" } // Case-insensitive search for the keyword "camera"
-
-    })
+      RESOLUTION: Resolution,
+      DESCRIPTION: { $regex: newCamera[0], $options: "i" }, // Case-insensitive search for the keyword "camera"
+    });
 
     res.send({
-      "success": true,
-      
-      "data": Camera
-    })
-  }
+      success: true,
+      data: Camera,
+    });
+  };
 
+  static getRecorder = async (req, res) => {
+    // const {Camera_type, Resolution, Additonal_Feature, audio_type, where_to_install} = req.body
+    try {
+      const Recorder = await Recorder_Modal.find();
 
-  static getRecorder =(req, res) => {
-    const {Camera_type, Resolution, Additonal_Feature, audio_type, where_to_install} = req.body
-
-  }
-
-
-
-
-  
+      res.send({
+        success: true,
+        data: Recorder,
+      });
+    } catch (error) {
+      console.log("error", error.message);
+    }
+  };
 }
 
 module.exports = MainController;

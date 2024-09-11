@@ -18,12 +18,18 @@ const upload = multer({
 });
 
 
+const upload2 = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
+})
+
+
 
 
 
 
 //middleware routes
-Route.use("/Post_Alarm_Instruction", checkUserAuth)
+// Route.use("/Post_Alarm_Instruction")
 
 //sheet to db
 Route.get("/getSpreed",  GoogleSheetController.getSpreed);
@@ -46,7 +52,15 @@ Route.post(
   ]),
   MainController.Post_Alarm_Instruction
 );
+Route.post("/Post_CCTV_Instruction",   upload2.fields([
+  { name: "Camera_Heigh_Of_Installation_Picture", maxCount: 1 },
+  { name: "Recorder_Heigh_Of_Installation_Picture", maxCount: 1 },
+]),
+MainController.Post_CCTV_Instruction)
 
 Route.post("/getCamera",MainController.getCamera);
+Route.get("/getRecorder", MainController.getRecorder)
+
+
 
 module.exports = Route;

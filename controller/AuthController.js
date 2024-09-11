@@ -25,13 +25,13 @@ class AuthController {
     RegisterAccount.save()
       .then(async () => {
         res.send({
-          status: true,
+          success: true,
           message: "Registered successfully",
         });
       })
       .catch((err) => {
         res.send({
-          status: false,
+          success: false,
           error: err,
         });
       });
@@ -56,7 +56,7 @@ class AuthController {
 
       if (comparePassword == true) {
         res.send({
-          status: true,
+          success: true,
           data: newUserData,
           token: token,
         });
@@ -100,10 +100,10 @@ class AuthController {
 
         // res.send({ "status": "Success", "message": "Password send succesfully", "token": token, "User_ID": user._id })
       } else {
-        res.send({ status: "Failed", message: "Email does not exist" });
+        res.send({ success: false, message: "Email does not exist" });
       }
     } else {
-      res.send({ status: "Failed", message: "Please enter your email" });
+      res.send({ success: false, message: "Please enter your email" });
     }
   };
 
@@ -124,7 +124,7 @@ class AuthController {
 
     if (password && password_confirmation) {
       if (password !== password_confirmation) {
-        res.send({ status: "Failed", message: "Password does not match" });
+        res.send({ success: false, message: "Password does not match" });
       } else {
         // Hash the new password and update the user's password
         const salt = await bcrypt.genSalt(10);
@@ -135,11 +135,11 @@ class AuthController {
         // Delete the OTP from the database since it has been used
         // await otpData?.remove();
 
-        res.send({ status: "Success", message: "Password Reset Successfully" });
+        res.send({ success: false, message: "Password Reset Successfully" });
       }
     } else {
       res.send({
-        status: "Failed",
+        success: false,
         message: "Password and confirmation are required",
       });
     }
