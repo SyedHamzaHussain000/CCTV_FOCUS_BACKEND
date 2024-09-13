@@ -29,7 +29,9 @@ const upload2 = multer({
 
 
 //middleware routes
-// Route.use("/Post_Alarm_Instruction")
+Route.use("/Post_Alarm_Instruction", checkUserAuth)
+Route.use("/getGeneratedPdf", checkUserAuth)
+
 
 //sheet to db
 Route.get("/getSpreed",  GoogleSheetController.getSpreed);
@@ -60,6 +62,7 @@ MainController.Post_CCTV_Instruction)
 
 Route.post("/getCamera",MainController.getCamera);
 Route.get("/getRecorder", MainController.getRecorder)
+Route.get("/getGeneratedPdf", MainController.getGeneratedPdf)
 
 
 

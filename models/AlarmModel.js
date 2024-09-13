@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 
 const AlarmModel = new mongoose.Schema({
-
+    report_generator_id: {
+        type: mongoose.Schema.ObjectId
+    },
     full_name: {
         type: String,
     },

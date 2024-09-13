@@ -1,9 +1,14 @@
 const cloudinary = require("cloudinary");
 const path = require("path");
+const puppeteer = require("puppeteer");
+const streamifier = require('streamifier');
+
 const AlarmModal = require("../models/AlarmModel");
 const CCTVModal = require("../models/CCTVModel");
 const Camera_Modal = require("../models/CameraAndRecorder_Data/CameraModel");
 const Recorder_Modal = require("../models/CameraAndRecorder_Data/RecorderModel");
+const AlaramReport_Model = require("../models/Reports_Modal/AlaramReportModel");
+
 // Configure Cloudinary
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -29,7 +34,15 @@ const uploadImageToCloudinary = (imageBuffer, publicId) => {
 };
 
 class MainController {
+
+  //Apis Functions
   static Post_Alarm_Instruction = async (req, res) => {
+
+    const userData = req.user
+
+
+    
+
     const {
       full_name,
       email,
@@ -51,10 +64,12 @@ class MainController {
       Shock_Sensor,
     } = req.body;
 
+   
     try {
       const imageUrls = {};
       const { ControlPanel_Image, KeyPad_Image, Matching_CCTV_Image } =
         req.files;
+
 
       if (ControlPanel_Image) {
         const fileNameWithoutExtension = path.basename(
@@ -90,6 +105,7 @@ class MainController {
       }
 
       const saveAlarmInstruction = await AlarmModal({
+        report_generator_id: userData._id,
         full_name: full_name,
         email: email,
         phone_number: phone_number,
@@ -113,21 +129,67 @@ class MainController {
         Shock_Sensor: Shock_Sensor,
       });
 
-      saveAlarmInstruction
+      await saveAlarmInstruction
         .save()
-        .then(() => {
-          res.send({
-            success: true,
-            message: "Successfully Alarm Created",
-            data: saveAlarmInstruction,
-          });
-        })
-        .catch((e) => {
-          res.send({
-            success: false,
-            message: e.message,
-          });
-        });
+       
+
+      // Generate the HTML template for the PDF
+      const htmlContent = `
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; }
+        h1 { color: blue; }
+      </style>
+    </head>
+    <body>
+      <h1>Alarm Instruction</h1>
+      <p>Full Name: ${full_name}</p>
+      <p>Email: ${email}</p>
+      <p>Phone Number: ${phone_number}</p>
+      <p>Address: ${address}</p>
+      <p>What Sector: ${What_Sector}</p>
+      <p>Property Size: ${PropertySize}</p>
+      <p>No Of Floor: ${No_Of_Floor}</p>
+      <p>Entry Point: ${Entry_Point}</p>
+      <p>Control Panel Location: ${ControlPanel_Location}</p>
+      <p>Control Panel Description: ${ControlPanel_Description}</p>
+      <p>KeyPad Location: ${KeyPad_Location}</p>
+      <p>Siren Location: ${Siren_Location}</p>
+      <p>Matching CCTV Description: ${Matching_CCTV_Description}</p>
+      <p>Sensors: ${Sensors}</p>
+      <p>Door Contacts: ${Door_Contacts}</p>
+      <p>Shock Sensor: ${Shock_Sensor}</p>
+    </body>
+    </html>
+  `;
+
+      const filename = `Alarm_pdf${Date.now()}`
+    // Generate the PDF from the HTML
+    const pdfBuffer = await this.generatePDFFromHTML(htmlContent);
+    console.log("pdfBuffer", pdfBuffer)
+    // Upload the generated PDF to Cloudinary
+    const pdfUploadResponse = await this.uploadPDFToCloudinary(pdfBuffer, filename);
+
+
+    const pdfSave = await AlaramReport_Model({
+      report_generator_id: userData._id,
+      pdf_url: pdfUploadResponse.secure_url,
+      pdf_type: "Alarm",
+      full_name: full_name,
+    })
+
+    await pdfSave.save()
+    // Respond with the success message and PDF URL
+    res.send({
+      success: true,
+      message: 'Successfully Alarm Created',
+      data: saveAlarmInstruction,
+      pdfUrl: pdfUploadResponse.secure_url,
+      pdf_type: "Alarm"
+    });
+
+
       // Send the response with the uploaded image URLs
     } catch (error) {
       console.error("Error during image upload:", error.message);
@@ -173,7 +235,6 @@ class MainController {
       Follow_Method_phone,
       Follow_Method_sms,
     } = req.body;
-
 
     try {
       let imageUrls = {};
@@ -304,6 +365,80 @@ class MainController {
       console.log("error", error.message);
     }
   };
+
+  static getGeneratedPdf = async (req, res) => {
+    const userData = req.user
+
+    console.log("first", userData)
+
+    try {
+      
+    
+
+    const getAllGeneratedPdf = await AlaramReport_Model.find({report_generator_id: userData._id})
+
+    res.send({
+      success : true,
+      data: getAllGeneratedPdf
+    })
+
+  } catch (error) {
+    res.send({
+      success : false,
+      message:error.message
+    })
+  }
+
+
+
+  }
+
+
+  //function to generate pdf and upload to cloud
+  static generatePDFFromHTML = async (htmlContent) => {
+    try {
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
+      await page.setContent(htmlContent, { waitUntil: "domcontentloaded" });
+
+      const pdfBuffer = await page.pdf({
+        format: "A4",
+        printBackground: true,
+      });
+
+      await browser.close();
+      return pdfBuffer;
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      throw error;
+    }
+  };
+
+  static uploadPDFToCloudinary = (pdfBuffer, fileName) => {
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.v2.uploader.upload_stream(
+        {
+          resource_type: "raw",
+          folder: "alarm_pdfs",
+          format: "pdf",
+          public_id: fileName,
+          access_mode: "public",
+        },
+        (error, result) => {
+          if (error) {
+            console.error("Cloudinary upload error:", error); // Log the error
+            reject(error);
+          } else {
+            console.log("Cloudinary upload result:", result); // Log the result
+            resolve(result);
+          }
+        }
+      );
+  
+      streamifier.createReadStream(pdfBuffer).pipe(uploadStream);
+    });
+  };
+  
 }
 
 module.exports = MainController;
