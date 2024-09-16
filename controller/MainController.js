@@ -219,11 +219,7 @@ class MainController {
       CCTV_Equipment,
       Security_Incident,
       Camera,
-      Camera_Heigh_Of_Installation_Text,
-      Camera_Heigh_Of_Installation_Desc,
       Recorder,
-      Recorder_Heigh_Of_Installation_Text,
-      Recorder_Heigh_Of_Installation_Desc,
       Cable_type,
       Cable_Length,
       Storage_Duration,
@@ -236,36 +232,66 @@ class MainController {
       Follow_Method_sms,
     } = req.body;
 
+      console.log("first",full_name,
+        email,
+        phone_number,
+        address,
+        What_Sector,
+        What_Sector_Step_Two,
+        What_Comercial_Sector,
+        What_Comercial_Other_Info,
+        What_Comercial_Postal_Code,
+        BedRooms,
+        Purpose_Of_Installment,
+        Area_of_Concern,
+        Security_System,
+        CCTV_Equipment,
+        Security_Incident,
+        Camera,
+        Recorder,
+        Cable_type,
+        Cable_Length,
+        Storage_Duration,
+        FireAlarm,
+        Smart_Lock,
+        Security_Lighting,
+        Special_Requirement,
+        Follow_Method_email,
+        Follow_Method_phone,
+        Follow_Method_sms,)
+      
+        // return
+
     try {
-      let imageUrls = {};
-      const {
-        Camera_Heigh_Of_Installation_Picture,
-        Recorder_Heigh_Of_Installation_Picture,
-      } = req.files;
+      // let imageUrls = {};
+      // const {
+      //   Camera_Heigh_Of_Installation_Picture,
+      //   Recorder_Heigh_Of_Installation_Picture,
+      // } = req.files;
 
-      if (Camera_Heigh_Of_Installation_Picture) {
-        const fileNameWithoutExtension = path.basename(
-          Camera_Heigh_Of_Installation_Picture[0].originalname,
-          path.extname(Camera_Heigh_Of_Installation_Picture[0].originalname)
-        );
-        imageUrls.Camera_Heigh_Of_Installation_Picture =
-          await uploadImageToCloudinary(
-            Camera_Heigh_Of_Installation_Picture[0].buffer,
-            `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`
-          );
-      }
+      // if (Camera_Heigh_Of_Installation_Picture) {
+      //   const fileNameWithoutExtension = path.basename(
+      //     Camera_Heigh_Of_Installation_Picture[0].originalname,
+      //     path.extname(Camera_Heigh_Of_Installation_Picture[0].originalname)
+      //   );
+      //   imageUrls.Camera_Heigh_Of_Installation_Picture =
+      //     await uploadImageToCloudinary(
+      //       Camera_Heigh_Of_Installation_Picture[0].buffer,
+      //       `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`
+      //     );
+      // }
 
-      if (Recorder_Heigh_Of_Installation_Picture) {
-        const fileNameWithoutExtension = path.basename(
-          Recorder_Heigh_Of_Installation_Picture[0].originalname,
-          path.extname(Recorder_Heigh_Of_Installation_Picture[0].originalname)
-        );
-        imageUrls.Recorder_Heigh_Of_Installation_Picture =
-          await uploadImageToCloudinary(
-            Recorder_Heigh_Of_Installation_Picture[0].buffer,
-            `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`
-          );
-      }
+      // if (Recorder_Heigh_Of_Installation_Picture) {
+      //   const fileNameWithoutExtension = path.basename(
+      //     Recorder_Heigh_Of_Installation_Picture[0].originalname,
+      //     path.extname(Recorder_Heigh_Of_Installation_Picture[0].originalname)
+      //   );
+      //   imageUrls.Recorder_Heigh_Of_Installation_Picture =
+      //     await uploadImageToCloudinary(
+      //       Recorder_Heigh_Of_Installation_Picture[0].buffer,
+      //       `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`
+      //     );
+      // }
 
       const saveCCTV_Instruction = await CCTVModal({
         full_name: full_name,
@@ -285,18 +311,18 @@ class MainController {
         Security_Incident: Security_Incident,
         Camera: JSON.parse(Camera),
         //Add image of camera installation
-        Camera_Heigh_Of_Installation_Picture:
-          imageUrls.Camera_Heigh_Of_Installation_Picture,
-        Camera_Heigh_Of_Installation_Text: Camera_Heigh_Of_Installation_Text,
-        Camera_Heigh_Of_Installation_Desc: Camera_Heigh_Of_Installation_Desc,
+        // Camera_Heigh_Of_Installation_Picture:
+        //   imageUrls.Camera_Heigh_Of_Installation_Picture,
+        // Camera_Heigh_Of_Installation_Text: Camera_Heigh_Of_Installation_Text,
+        // Camera_Heigh_Of_Installation_Desc: Camera_Heigh_Of_Installation_Desc,
         Recorder: JSON.parse(Recorder),
         //Add image of Recorder installation
-        Recorder_Heigh_Of_Installation_Picture:
-          imageUrls.Recorder_Heigh_Of_Installation_Picture,
-        Recorder_Heigh_Of_Installation_Text:
-          Recorder_Heigh_Of_Installation_Text,
-        Recorder_Heigh_Of_Installation_Desc:
-          Recorder_Heigh_Of_Installation_Desc,
+        // Recorder_Heigh_Of_Installation_Picture:
+        //   imageUrls.Recorder_Heigh_Of_Installation_Picture,
+        // Recorder_Heigh_Of_Installation_Text:
+        //   Recorder_Heigh_Of_Installation_Text,
+        // Recorder_Heigh_Of_Installation_Desc:
+        //   Recorder_Heigh_Of_Installation_Desc,
         Cable_type: Cable_type,
         Cable_Length: Cable_Length,
         Storage_Duration: Storage_Duration,

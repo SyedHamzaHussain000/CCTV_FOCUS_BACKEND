@@ -63,17 +63,21 @@ const CCTVModal = new mongoose.Schema({
         PRICE: String,
         Compatible_Bracket: String,
         Wall_Bracket: String,
-        TYPE: String, 
+        TYPE: String,
+        heightOfInstallation: String,
+        heighBrief: String,
+        HeightOfInstallationImage: String,
+
     }],
-    Camera_Heigh_Of_Installation_Picture:{
-        type: String,
-    },
-    Camera_Heigh_Of_Installation_Text:{
-        type: String,
-    },
-    Camera_Heigh_Of_Installation_Desc:{
-        type: String,
-    },
+    // Camera_Heigh_Of_Installation_Picture:{
+    //     type: String,
+    // },
+    // Camera_Heigh_Of_Installation_Text:{
+    //     type: String,
+    // },
+    // Camera_Heigh_Of_Installation_Desc:{
+    //     type: String,
+    // },
 
     Recorder:[{
         Recorder_id: {
@@ -91,15 +95,15 @@ const CCTVModal = new mongoose.Schema({
         Wall_Bracket: String,
         TYPE: String, 
     }],
-    Recorder_Heigh_Of_Installation_Picture:{
-        type: String,
-    },
-    Recorder_Heigh_Of_Installation_Text:{
-        type: String,
-    },
-    Recorder_Heigh_Of_Installation_Desc:{
-        type: String,
-    },
+    // Recorder_Heigh_Of_Installation_Picture:{
+    //     type: String,
+    // },
+    // Recorder_Heigh_Of_Installation_Text:{
+    //     type: String,
+    // },
+    // Recorder_Heigh_Of_Installation_Desc:{
+    //     type: String,
+    // },
     Cable_type:{
         type: String,
     },
@@ -122,13 +126,13 @@ const CCTVModal = new mongoose.Schema({
         type: String
     },
     Follow_Method_email:{
-        type: String
+        type: Boolean
     },
     Follow_Method_phone:{
-        type: String
+        type: Boolean
     },
     Follow_Method_sms:{
-        type: String
+        type: Boolean
     },
 
 
