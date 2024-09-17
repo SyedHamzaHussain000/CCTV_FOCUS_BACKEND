@@ -30,6 +30,7 @@ const upload2 = multer({
 
 //middleware routes
 Route.use("/Post_Alarm_Instruction", checkUserAuth)
+Route.use("/Post_CCTV_Instruction", checkUserAuth)
 Route.use("/getGeneratedPdf", checkUserAuth)
 
 

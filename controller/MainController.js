@@ -206,8 +206,8 @@ class MainController {
 
   static Post_CCTV_Instruction = async (req, res) => {
     const { Camera_Heigh_Of_Installation_Picture, Recorder_Heigh_Of_Installation_Picture } = req.files;
+    const userData = req.user
 
-    console.log("API is called", Camera_Heigh_Of_Installation_Picture, Recorder_Heigh_Of_Installation_Picture);
 
     try {
         // Function to upload images to Cloudinary
@@ -296,12 +296,84 @@ class MainController {
             Follow_Method_sms: req.body.Follow_Method_sms,
         });
 
+
+
         await saveCCTV_Instruction.save();
+        const htmlContent = `
+        <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; }
+            h1 { color: blue; }
+            p { margin: 5px 0; }
+          </style>
+        </head>
+        <body>
+          <h1>CCTV Instruction</h1>
+          <p><strong>Full Name:</strong> ${req.body.full_name}</p>
+          <p><strong>Email:</strong> ${req.body.email}</p>
+          <p><strong>Phone Number:</strong> ${req.body.phone_number}</p>
+          <p><strong>Address:</strong> ${req.body.address}</p>
+          <p><strong>What Sector:</strong> ${req.body.What_Sector}</p>
+          <p><strong>What Sector Step Two:</strong> ${req.body.What_Sector_Step_Two}</p>
+          <p><strong>What Comercial Sector:</strong> ${req.body.What_Comercial_Sector}</p>
+          <p><strong>What Comercial Other Info:</strong> ${req.body.What_Comercial_Other_Info}</p>
+          <p><strong>What Comercial Postal Code:</strong> ${req.body.What_Comercial_Postal_Code}</p>
+          <p><strong>Bedrooms:</strong> ${req.body.BedRooms}</p>
+          <p><strong>Purpose of Installment:</strong> ${req.body.Purpose_Of_Installment}</p>
+          <p><strong>Area of Concern:</strong> ${req.body.Area_of_Concern}</p>
+          <p><strong>Security System:</strong> ${req.body.Security_System}</p>
+          <p><strong>CCTV Equipment:</strong> ${req.body.CCTV_Equipment}</p>
+          <p><strong>Security Incident:</strong> ${req.body.Security_Incident}</p>
+          
+          <h2>Camera Details</h2>
+          <p><strong>Camera:</strong> ${JSON.stringify(parsedCamera, null, 2)}</p>
+          <p><strong>Camera Height Of Installation Images:</strong></p>
+          ${cameraImageUrls.map(url => `<img src="${url}" alt="Camera Image" style="max-width: 300px; margin-bottom: 10px;">`).join('')}
+          
+          <h2>Recorder Details</h2>
+          <p><strong>Recorder:</strong> ${JSON.stringify(parsedRecorder, null, 2)}</p>
+          <p><strong>Recorder Height Of Installation Images:</strong></p>
+          ${recorderImageUrls.map(url => `<img src="${url}" alt="Recorder Image" style="max-width: 300px; margin-bottom: 10px;">`).join('')}
+          
+          
+          <p><strong>Cable Type:</strong> ${req.body.Cable_type}</p>
+          <p><strong>Cable Length:</strong> ${req.body.Cable_Length}</p>
+          <p><strong>Storage Duration:</strong> ${req.body.Storage_Duration}</p>
+          <p><strong>Fire Alarm:</strong> ${req.body.FireAlarm}</p>
+          <p><strong>Smart Lock:</strong> ${req.body.Smart_Lock}</p>
+          <p><strong>Security Lighting:</strong> ${req.body.Security_Lighting}</p>
+          <p><strong>Special Requirement:</strong> ${req.body.Special_Requirement}</p>
+          <p><strong>Follow Method Email:</strong> ${req.body.Follow_Method_email}</p>
+          <p><strong>Follow Method Phone:</strong> ${req.body.Follow_Method_phone}</p>
+          <p><strong>Follow Method SMS:</strong> ${req.body.Follow_Method_sms}</p>
+        </body>
+        </html>
+        `;
+
+        const filename = `Alarm_pdf${Date.now()}`
+        // Generate the PDF from the HTML
+        const pdfBuffer = await this.generatePDFFromHTML(htmlContent);
+        console.log("pdfBuffer", pdfBuffer)
+        // Upload the generated PDF to Cloudinary
+        const pdfUploadResponse = await this.uploadPDFToCloudinary(pdfBuffer, filename);
+        
+
+    const pdfSave = await AlaramReport_Model({
+      report_generator_id: userData._id,
+      pdf_url: pdfUploadResponse.secure_url,
+      pdf_type: "CCTV",
+      full_name: req.body.full_name,
+    })
+
+    await pdfSave.save()
 
         res.send({
             success: true,
             message: 'Successfully created CCTV instruction',
             data: saveCCTV_Instruction,
+            pdfUrl: pdfUploadResponse.secure_url,
+            pdf_type: "Camera"
         });
     } catch (err) {
         console.error('Error:', err);
