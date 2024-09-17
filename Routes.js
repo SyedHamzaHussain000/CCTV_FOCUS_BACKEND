@@ -55,8 +55,8 @@ Route.post(
   MainController.Post_Alarm_Instruction
 );
 Route.post("/Post_CCTV_Instruction",   upload2.fields([
-  { name: "Camera_Heigh_Of_Installation_Picture", maxCount: 1 },
-  { name: "Recorder_Heigh_Of_Installation_Picture", maxCount: 1 },
+  { name: "Camera_Heigh_Of_Installation_Picture", maxCount:10 },
+  { name: "Recorder_Heigh_Of_Installation_Picture", maxCount:10 },
 ]),
 MainController.Post_CCTV_Instruction)
 

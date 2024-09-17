@@ -2,12 +2,15 @@ const cloudinary = require("cloudinary");
 const path = require("path");
 const puppeteer = require("puppeteer");
 const streamifier = require('streamifier');
+const fs = require('fs'); // Required to check the file system
 
 const AlarmModal = require("../models/AlarmModel");
 const CCTVModal = require("../models/CCTVModel");
 const Camera_Modal = require("../models/CameraAndRecorder_Data/CameraModel");
 const Recorder_Modal = require("../models/CameraAndRecorder_Data/RecorderModel");
 const AlaramReport_Model = require("../models/Reports_Modal/AlaramReportModel");
+const { response } = require("express");
+const { constants } = require("crypto");
 
 // Configure Cloudinary
 cloudinary.v2.config({
@@ -202,158 +205,289 @@ class MainController {
   };
 
   static Post_CCTV_Instruction = async (req, res) => {
-    const {
-      full_name,
-      email,
-      phone_number,
-      address,
-      What_Sector,
-      What_Sector_Step_Two,
-      What_Comercial_Sector,
-      What_Comercial_Other_Info,
-      What_Comercial_Postal_Code,
-      BedRooms,
-      Purpose_Of_Installment,
-      Area_of_Concern,
-      Security_System,
-      CCTV_Equipment,
-      Security_Incident,
-      Camera,
-      Recorder,
-      Cable_type,
-      Cable_Length,
-      Storage_Duration,
-      FireAlarm,
-      Smart_Lock,
-      Security_Lighting,
-      Special_Requirement,
-      Follow_Method_email,
-      Follow_Method_phone,
-      Follow_Method_sms,
-    } = req.body;
+    const { Camera_Heigh_Of_Installation_Picture, Recorder_Heigh_Of_Installation_Picture } = req.files;
 
-      console.log("first",full_name,
-        email,
-        phone_number,
-        address,
-        What_Sector,
-        What_Sector_Step_Two,
-        What_Comercial_Sector,
-        What_Comercial_Other_Info,
-        What_Comercial_Postal_Code,
-        BedRooms,
-        Purpose_Of_Installment,
-        Area_of_Concern,
-        Security_System,
-        CCTV_Equipment,
-        Security_Incident,
-        Camera,
-        Recorder,
-        Cable_type,
-        Cable_Length,
-        Storage_Duration,
-        FireAlarm,
-        Smart_Lock,
-        Security_Lighting,
-        Special_Requirement,
-        Follow_Method_email,
-        Follow_Method_phone,
-        Follow_Method_sms,)
-      
-        // return
+    console.log("API is called", Camera_Heigh_Of_Installation_Picture, Recorder_Heigh_Of_Installation_Picture);
 
     try {
-      // let imageUrls = {};
-      // const {
-      //   Camera_Heigh_Of_Installation_Picture,
-      //   Recorder_Heigh_Of_Installation_Picture,
-      // } = req.files;
+        // Function to upload images to Cloudinary
+        const uploadImagesToCloudinary = (pdfBuffer, fileName) => {
+          return new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.v2.uploader.upload_stream(
+              {
+                resource_type: "image",
+                folder: "CCTVandRecorder",
+                public_id: fileName,
+                access_mode: "public",
+              },
+              (error, result) => {
+                if (error) {
+                  console.error("Cloudinary upload error:", error); // Log the error
+                  reject(error);
+                } else {
+                  console.log("Cloudinary upload result:", result); // Log the result
+                  resolve(result);
+                }
+              }
+            );
+        
+            streamifier.createReadStream(pdfBuffer).pipe(uploadStream);
+          });
+        };
 
-      // if (Camera_Heigh_Of_Installation_Picture) {
-      //   const fileNameWithoutExtension = path.basename(
-      //     Camera_Heigh_Of_Installation_Picture[0].originalname,
-      //     path.extname(Camera_Heigh_Of_Installation_Picture[0].originalname)
-      //   );
-      //   imageUrls.Camera_Heigh_Of_Installation_Picture =
-      //     await uploadImageToCloudinary(
-      //       Camera_Heigh_Of_Installation_Picture[0].buffer,
-      //       `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`
-      //     );
-      // }
+        // Helper function to handle multiple image uploads in parallel
+        const uploadImages = async (images, folderName) => {
+            if (!images) return [];
+            const uploadPromises = images.map(async (image) => {
+                const fileNameWithoutExtension = path.basename(image.originalname, path.extname(image.originalname));
+                console.log(`Preparing to upload ${fileNameWithoutExtension}`);
+                try {
+                    const url = await uploadImagesToCloudinary(image.buffer, folderName, fileNameWithoutExtension);
+                    console.log(`Uploaded ${fileNameWithoutExtension} to ${url}`);
+                    return url.url;
+                } catch (error) {
+                    console.error(`Error uploading ${fileNameWithoutExtension}:`, error);
+                    return null;
+                }
+            });
+            return Promise.all(uploadPromises);
+        };
 
-      // if (Recorder_Heigh_Of_Installation_Picture) {
-      //   const fileNameWithoutExtension = path.basename(
-      //     Recorder_Heigh_Of_Installation_Picture[0].originalname,
-      //     path.extname(Recorder_Heigh_Of_Installation_Picture[0].originalname)
-      //   );
-      //   imageUrls.Recorder_Heigh_Of_Installation_Picture =
-      //     await uploadImageToCloudinary(
-      //       Recorder_Heigh_Of_Installation_Picture[0].buffer,
-      //       `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`
-      //     );
-      // }
+        // Upload Camera and Recorder images in parallel
+        const [cameraImageUrls, recorderImageUrls] = await Promise.all([
+            uploadImages(Camera_Heigh_Of_Installation_Picture, 'CCTV_CAMERA/Camera_Images'),
+            uploadImages(Recorder_Heigh_Of_Installation_Picture, 'CCTV_CAMERA/Recorder_Images')
+        ]);
 
-      const saveCCTV_Instruction = await CCTVModal({
-        full_name: full_name,
-        email: email,
-        phone_number: phone_number,
-        address: address,
-        What_Sector: What_Sector,
-        What_Sector_Step_Two: What_Sector_Step_Two,
-        What_Comercial_Sector: What_Comercial_Sector,
-        What_Comercial_Other_Info: What_Comercial_Other_Info,
-        What_Comercial_Postal_Code: What_Comercial_Postal_Code,
-        BedRooms: BedRooms,
-        Purpose_Of_Installment: Purpose_Of_Installment,
-        Area_of_Concern: Area_of_Concern,
-        Security_System: Security_System,
-        CCTV_Equipment: CCTV_Equipment,
-        Security_Incident: Security_Incident,
-        Camera: JSON.parse(Camera),
-        //Add image of camera installation
-        // Camera_Heigh_Of_Installation_Picture:
-        //   imageUrls.Camera_Heigh_Of_Installation_Picture,
-        // Camera_Heigh_Of_Installation_Text: Camera_Heigh_Of_Installation_Text,
-        // Camera_Heigh_Of_Installation_Desc: Camera_Heigh_Of_Installation_Desc,
-        Recorder: JSON.parse(Recorder),
-        //Add image of Recorder installation
-        // Recorder_Heigh_Of_Installation_Picture:
-        //   imageUrls.Recorder_Heigh_Of_Installation_Picture,
-        // Recorder_Heigh_Of_Installation_Text:
-        //   Recorder_Heigh_Of_Installation_Text,
-        // Recorder_Heigh_Of_Installation_Desc:
-        //   Recorder_Heigh_Of_Installation_Desc,
-        Cable_type: Cable_type,
-        Cable_Length: Cable_Length,
-        Storage_Duration: Storage_Duration,
-        FireAlarm: FireAlarm,
-        Smart_Lock: Smart_Lock,
-        Security_Lighting: Security_Lighting,
-        Special_Requirement: Special_Requirement,
-        Follow_Method_email: Follow_Method_email,
-        Follow_Method_phone: Follow_Method_phone,
-        Follow_Method_sms: Follow_Method_sms,
-      });
+        // Parse the Camera and Recorder JSON
+        const parsedCamera = JSON.parse(req.body.Camera);
+        const parsedRecorder = JSON.parse(req.body.Recorder);
 
-      saveCCTV_Instruction
-        .save()
-        .then(() => {
-          res.send({
+        // Create and save the instruction
+        const saveCCTV_Instruction = new CCTVModal({
+            full_name: req.body.full_name,
+            email: req.body.email,
+            phone_number: req.body.phone_number,
+            address: req.body.address,
+            What_Sector: req.body.What_Sector,
+            What_Sector_Step_Two: req.body.What_Sector_Step_Two,
+            What_Comercial_Sector: req.body.What_Comercial_Sector,
+            What_Comercial_Other_Info: req.body.What_Comercial_Other_Info,
+            What_Comercial_Postal_Code: req.body.What_Comercial_Postal_Code,
+            BedRooms: req.body.BedRooms,
+            Purpose_Of_Installment: req.body.Purpose_Of_Installment,
+            Area_of_Concern: req.body.Area_of_Concern,
+            Security_System: req.body.Security_System,
+            CCTV_Equipment: req.body.CCTV_Equipment,
+            Security_Incident: req.body.Security_Incident,
+            Camera: parsedCamera,
+            cameraHeightOfInstallationImages: cameraImageUrls.filter(url => url !== null),
+            Recorder: parsedRecorder,
+            recorderHeightOfInstallationImages: recorderImageUrls.filter(url => url !== null),
+            Cable_type: req.body.Cable_type,
+            Cable_Length: req.body.Cable_Length,
+            Storage_Duration: req.body.Storage_Duration,
+            FireAlarm: req.body.FireAlarm,
+            Smart_Lock: req.body.Smart_Lock,
+            Security_Lighting: req.body.Security_Lighting,
+            Special_Requirement: req.body.Special_Requirement,
+            Follow_Method_email: req.body.Follow_Method_email,
+            Follow_Method_phone: req.body.Follow_Method_phone,
+            Follow_Method_sms: req.body.Follow_Method_sms,
+        });
+
+        await saveCCTV_Instruction.save();
+
+        res.send({
             success: true,
-            message: "Successfully CCTV Created",
+            message: 'Successfully created CCTV instruction',
             data: saveCCTV_Instruction,
-          });
-        })
-        .catch((e) => {
-          res.send({
-            success: false,
-            message: e.message,
-          });
         });
     } catch (err) {
-      console.log(err.message);
+        console.error('Error:', err);
+        res.status(500).send({
+            success: false,
+            message: err.message,
+        });
     }
-  };
+};
+
+
+  
+    // static Post_CCTV_Instruction = async (req, res) => {
+
+    //   console.log("Request Files:", req.files); // Log the files object
+
+    //   const {Camera_Heigh_Of_Installation_Picture, Recorder_Heigh_Of_Installation_Picture} = req.files
+      
+
+    //   res.send({
+    //     Camera_Heigh_Of_Installation_Picture:Camera_Heigh_Of_Installation_Picture,
+    //     Recorder_Heigh_Of_Installation_Picture:Recorder_Heigh_Of_Installation_Picture
+    //   })
+
+    //   return
+
+    //   const {
+    //     full_name,
+    //     email,
+    //     phone_number, 
+    //     address,
+    //     What_Sector,
+    //     What_Sector_Step_Two,
+    //     What_Comercial_Sector,
+    //     What_Comercial_Other_Info,
+    //     What_Comercial_Postal_Code,
+    //     BedRooms,
+    //     Purpose_Of_Installment,
+    //     Area_of_Concern,
+    //     Security_System,
+    //     CCTV_Equipment,
+    //     Security_Incident,
+    //     Camera,
+    //     Recorder,
+    //     Cable_type,
+    //     Cable_Length,
+    //     Storage_Duration,
+    //     FireAlarm,
+    //     Smart_Lock,
+    //     Security_Lighting,
+    //     Special_Requirement,
+    //     Follow_Method_email,
+    //     Follow_Method_phone,
+    //     Follow_Method_sms,
+    //   } = req.body;
+
+      
+    //   // const {Camera_Heigh_Of_Installation_Picture} = req.files
+    //   console.log("first",Camera)
+    //   return 
+    //     // console.log("first",full_name,
+    //     //   email,
+    //     //   phone_number,
+    //     //   address,
+    //     //   What_Sector,
+    //     //   What_Sector_Step_Two,
+    //     //   What_Comercial_Sector,
+    //     //   What_Comercial_Other_Info,
+    //     //   What_Comercial_Postal_Code,
+    //     //   BedRooms,
+    //     //   Purpose_Of_Installment,
+    //     //   Area_of_Concern,
+    //     //   Security_System,
+    //     //   CCTV_Equipment,
+    //     //   Security_Incident,
+    //     //   Camera,
+    //     //   Recorder,
+    //     //   Cable_type,
+    //     //   Cable_Length,
+    //     //   Storage_Duration,
+    //     //   FireAlarm,
+    //     //   Smart_Lock,
+    //     //   Security_Lighting,
+    //     //   Special_Requirement,
+    //     //   Follow_Method_email,
+    //     //   Follow_Method_phone,
+    //     //   Follow_Method_sms,)
+    //         // Parse the Camera array (as it's sent as JSON string)
+      
+    //   // Parse the Camera array (as it's sent as JSON string)
+
+
+    //   try {
+    //     // let imageUrls = {};
+    //     // const {
+    //     //   Camera_Heigh_Of_Installation_Picture,
+    //     //   Recorder_Heigh_Of_Installation_Picture,
+    //     // } = req.files;
+
+    //     // if (Camera_Heigh_Of_Installation_Picture) {
+    //     //   const fileNameWithoutExtension = path.basename(
+    //     //     Camera_Heigh_Of_Installation_Picture[0].originalname,
+    //     //     path.extname(Camera_Heigh_Of_Installation_Picture[0].originalname)
+    //     //   );
+    //     //   imageUrls.Camera_Heigh_Of_Installation_Picture =
+    //     //     await uploadImageToCloudinary(
+    //     //       Camera_Heigh_Of_Installation_Picture[0].buffer,
+    //     //       `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`
+    //     //     );
+    //     // }
+
+    //     // if (Recorder_Heigh_Of_Installation_Picture) {
+    //     //   const fileNameWithoutExtension = path.basename(
+    //     //     Recorder_Heigh_Of_Installation_Picture[0].originalname,
+    //     //     path.extname(Recorder_Heigh_Of_Installation_Picture[0].originalname)
+    //     //   );
+    //     //   imageUrls.Recorder_Heigh_Of_Installation_Picture =
+    //     //     await uploadImageToCloudinary(
+    //     //       Recorder_Heigh_Of_Installation_Picture[0].buffer,
+    //     //       `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`
+    //     //     );
+    //     // }
+
+    //     const saveCCTV_Instruction = await CCTVModal({
+    //       full_name: full_name,
+    //       email: email,
+    //       phone_number: phone_number,
+    //       address: address,
+    //       What_Sector: What_Sector,
+    //       What_Sector_Step_Two: What_Sector_Step_Two,
+    //       What_Comercial_Sector: What_Comercial_Sector,
+    //       What_Comercial_Other_Info: What_Comercial_Other_Info,
+    //       What_Comercial_Postal_Code: What_Comercial_Postal_Code,
+    //       BedRooms: BedRooms,
+    //       Purpose_Of_Installment: Purpose_Of_Installment,
+    //       Area_of_Concern: Area_of_Concern,
+    //       Security_System: Security_System,
+    //       CCTV_Equipment: CCTV_Equipment,
+    //       Security_Incident: Security_Incident,
+    //       Camera: JSON.parse(Camera),
+    //       // cameraHeightOfInstallation: [6 urls],
+    //       // recorderHeightOfInstallation: [3 urls],
+    //       //Add image of camera installation
+    //       // Camera_Heigh_Of_Installation_Picture:
+    //       //   imageUrls.Camera_Heigh_Of_Installation_Picture,
+    //       // Camera_Heigh_Of_Installation_Text: Camera_Heigh_Of_Installation_Text,
+    //       // Camera_Heigh_Of_Installation_Desc: Camera_Heigh_Of_Installation_Desc,
+    //       Recorder: JSON.parse(Recorder),
+    //       //Add image of Recorder installation
+    //       // Recorder_Heigh_Of_Installation_Picture:
+    //       //   imageUrls.Recorder_Heigh_Of_Installation_Picture,
+    //       // Recorder_Heigh_Of_Installation_Text:
+    //       //   Recorder_Heigh_Of_Installation_Text,
+    //       // Recorder_Heigh_Of_Installation_Desc:
+    //       //   Recorder_Heigh_Of_Installation_Desc,
+    //       Cable_type: Cable_type,
+    //       Cable_Length: Cable_Length,
+    //       Storage_Duration: Storage_Duration,
+    //       FireAlarm: FireAlarm,
+    //       Smart_Lock: Smart_Lock,
+    //       Security_Lighting: Security_Lighting,
+    //       Special_Requirement: Special_Requirement,
+    //       Follow_Method_email: Follow_Method_email,
+    //       Follow_Method_phone: Follow_Method_phone,
+    //       Follow_Method_sms: Follow_Method_sms,
+    //     });
+
+    //     saveCCTV_Instruction
+    //       .save()
+    //       .then(() => {
+    //         res.send({
+    //           success: true,
+    //           message: "Successfully CCTV Created",
+    //           data: saveCCTV_Instruction,
+    //         });
+    //       })
+    //       .catch((e) => {
+    //         res.send({
+    //           success: false,
+    //           message: e.message,
+    //         });
+    //       });
+    //   } catch (err) {
+    //     console.log(err.message);
+    //   }
+    // };
 
   static getCamera = async (req, res) => {
     const {

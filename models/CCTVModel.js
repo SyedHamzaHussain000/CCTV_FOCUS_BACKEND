@@ -69,15 +69,7 @@ const CCTVModal = new mongoose.Schema({
         HeightOfInstallationImage: String,
 
     }],
-    // Camera_Heigh_Of_Installation_Picture:{
-    //     type: String,
-    // },
-    // Camera_Heigh_Of_Installation_Text:{
-    //     type: String,
-    // },
-    // Camera_Heigh_Of_Installation_Desc:{
-    //     type: String,
-    // },
+    cameraHeightOfInstallationImages: [],
 
     Recorder:[{
         Recorder_id: {
@@ -95,15 +87,7 @@ const CCTVModal = new mongoose.Schema({
         Wall_Bracket: String,
         TYPE: String, 
     }],
-    // Recorder_Heigh_Of_Installation_Picture:{
-    //     type: String,
-    // },
-    // Recorder_Heigh_Of_Installation_Text:{
-    //     type: String,
-    // },
-    // Recorder_Heigh_Of_Installation_Desc:{
-    //     type: String,
-    // },
+    recorderHeightOfInstallationImages:[],
     Cable_type:{
         type: String,
     },
