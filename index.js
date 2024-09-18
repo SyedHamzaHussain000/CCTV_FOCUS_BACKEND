@@ -15,6 +15,12 @@ app.use(express.json())
 app.use('/api', route)
 
 
+app.get('/',(req, res)=>{
+    res.send({
+        success: true,
+        dev: "Project runs"
+    })
+})
 
 // app.get('/fetch-images', async (req, res) => {
 //     try {
