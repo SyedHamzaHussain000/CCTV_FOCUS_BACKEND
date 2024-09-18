@@ -4,13 +4,20 @@ const puppeteer = require("puppeteer");
 const streamifier = require('streamifier');
 const fs = require('fs'); // Required to check the file system
 
+const User_Modal = require('../models/UserModel')
 const AlarmModal = require("../models/AlarmModel");
 const CCTVModal = require("../models/CCTVModel");
 const Camera_Modal = require("../models/CameraAndRecorder_Data/CameraModel");
 const Recorder_Modal = require("../models/CameraAndRecorder_Data/RecorderModel");
 const AlaramReport_Model = require("../models/Reports_Modal/AlaramReportModel");
+const Graph_Modal = require("../models/GraphCCTVModal")
+
+const bcrypt = require("bcryptjs");
+
+
 const { response } = require("express");
 const { constants } = require("crypto");
+const Graph_Alarm = require("../models/GraphAlarmModal");
 
 // Configure Cloudinary
 cloudinary.v2.config({
@@ -598,6 +605,106 @@ class MainController {
     }
   };
 
+
+  static GetCountOfCameraAndRecorder = async(req, res) => {
+
+    try {
+      
+    
+    const Recorder = await Recorder_Modal.countDocuments({})
+    const Camera = await Camera_Modal.countDocuments({})
+
+
+
+    res.send({
+      success: true,
+      Recorder_Count : Recorder,
+      Camera_Count : Camera
+    })
+
+  } catch (error) {
+    res.send({
+      success: false,
+      message: error.message
+    }) 
+  }
+
+  }
+
+  static generateGraph = async (req, res) => {
+    const user_data = req.user;
+    const { type, label, ...otherData } = req.body; // Destructure other data
+  
+    try {
+      // Check for existing label based on type and date
+      const existingGraph = await (type === 'CCTV' ? Graph_Modal : Graph_Alarm).findOne({
+        user_id: user_data._id,
+        label,
+      });
+  
+      if (existingGraph) {
+        // Update existing graph value by 1
+        existingGraph.value++;
+        await existingGraph.save();
+  
+        // console.log(`Updated existing ${type} graph with label: ${label}`);
+      } else {
+        // Create a new graph
+        const newGraph = new (type === 'CCTV' ? Graph_Modal : Graph_Alarm)({
+          user_id: user_data._id,
+          ...otherData, // Spread remaining data
+        });
+  
+        await newGraph.save();
+        // console.log(`Created new ${type} graph with label: ${label}`);
+      }
+  
+      res.send({
+        success: true,
+        message: `Graph(s) generated successfully!`,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ success: false, error: error.message });
+    }
+  };
+
+
+  static ChangePassword = async (req, res) => {
+    const { email, oldPassword, newPassword } = req.body;
+  
+    try {
+      // 1. Find user by email
+      const userData = await User_Modal.findOne({ email: email });
+  
+      if (!userData) {
+        return res.send({ success: false, message: "User not found" });
+      }
+  
+      // 2. Compare old password
+      const isPasswordCorrect = await bcrypt.compare(oldPassword, userData.password);
+  
+      if (!isPasswordCorrect) {
+        return res.send({ success: false, message: "Your current password is not correct" });
+      }
+  
+      // 3. Hash the new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10); // Adjust cost factor as needed
+  
+      // 4. Update user password
+      userData.password = hashedPassword;
+      await userData.save();
+  
+      // 5. Respond with success message
+      res.send({ success: true, message: "Password changed successfully" });
+    } catch (error) {
+      console.error(error);
+      res.send({ success: false, message: "Error changing password" });
+    }
+  };
+  
+
+
   static getGeneratedPdf = async (req, res) => {
     const userData = req.user
 
@@ -624,8 +731,6 @@ class MainController {
 
 
   }
-
-
   //function to generate pdf and upload to cloud
   static generatePDFFromHTML = async (htmlContent) => {
     try {
@@ -670,6 +775,9 @@ class MainController {
       streamifier.createReadStream(pdfBuffer).pipe(uploadStream);
     });
   };
+
+
+
   
 }
 

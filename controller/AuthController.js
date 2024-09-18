@@ -61,6 +61,12 @@ class AuthController {
           token: token,
         });
       }
+    }else{
+      res.send({
+        success: false,
+        message: "User not exist"
+
+      })
     }
   };
 
