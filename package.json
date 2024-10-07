@@ -1,0 +1,35 @@
+{
+  "name": "cctv_focus_backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "fs": "^0.0.1-security",
+    "google-auth-library": "^9.14.1",
+    "googleapis": "^144.0.0",
+    "html-pdf-node": "^1.0.8",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.5.4",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^3.1.4",
+    "puppeteer-core": "^23.4.0",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "streamifier": "^0.1.1"
+  },
+  "devDependencies": {
+    "puppeteer": "^23.4.0"
+  }
+}
