@@ -33,7 +33,7 @@ Route.use("/Post_Alarm_Instruction", checkUserAuth)
 Route.use("/Post_CCTV_Instruction", checkUserAuth)
 Route.use("/getGeneratedPdf", checkUserAuth)
 Route.use("/generateGraph", checkUserAuth)
-Route.use("/generateGraph", checkUserAuth)
+Route.use("/getGraph", checkUserAuth)
 
 
 //sheet to db
@@ -68,9 +68,10 @@ Route.post("/getCamera",MainController.getCamera);
 Route.get("/getRecorder", MainController.getRecorder)
 Route.get("/getGeneratedPdf", MainController.getGeneratedPdf)
 Route.get("/GetCountOfCameraAndRecorder", MainController.GetCountOfCameraAndRecorder)
-Route.post("/generateGraph", MainController.generateGraph)
+// Route.post("/generateGraph", MainController.generateGraph)
 Route.post("/ChangePassword", MainController.ChangePassword)
-Route.get("/genPdf", MainController.genPdf)
+// Route.get("/genPdf", MainController.genPdf)
+Route.post("/getGraph", MainController.getGraph)
 
 
 module.exports = Route;

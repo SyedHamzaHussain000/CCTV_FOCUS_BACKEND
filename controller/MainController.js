@@ -13,16 +13,17 @@ const CCTVModal = require("../models/CCTVModel");
 const Camera_Modal = require("../models/CameraAndRecorder_Data/CameraModel");
 const Recorder_Modal = require("../models/CameraAndRecorder_Data/RecorderModel");
 const AlaramReport_Model = require("../models/Reports_Modal/AlaramReportModel");
+
 const Graph_Modal = require("../models/GraphCCTVModal");
+const Graph_Alarm = require("../models/GraphAlarmModal");
 
 const bcrypt = require("bcryptjs");
 
 const { response } = require("express");
 const { constants } = require("crypto");
-const Graph_Alarm = require("../models/GraphAlarmModal");
 
 const html_to_pdf = require("html-pdf-node");
-
+const moment = require("moment");
 // Configure Cloudinary
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -111,6 +112,10 @@ class MainController {
         );
       }
 
+      const graphResult = await this.generateGraph(userData._id, "Alarm");
+
+      console.log("graphResult",graphResult)
+
       const saveAlarmInstruction = await AlarmModal({
         report_generator_id: userData._id,
         full_name: full_name,
@@ -186,7 +191,9 @@ class MainController {
         full_name: full_name,
       });
 
+      
       await pdfSave.save();
+
       // Respond with the success message and PDF URL
       res.send({
         success: true,
@@ -194,7 +201,9 @@ class MainController {
         data: saveAlarmInstruction,
         pdfUrl: pdfUploadResponse.secure_url,
         pdf_type: "Alarm",
-      });
+      })
+
+
 
       // Send the response with the uploaded image URLs
     } catch (error) {
@@ -449,177 +458,6 @@ class MainController {
     }
   };
 
-  // static Post_CCTV_Instruction = async (req, res) => {
-
-  //   console.log("Request Files:", req.files); // Log the files object
-
-  //   const {Camera_Heigh_Of_Installation_Picture, Recorder_Heigh_Of_Installation_Picture} = req.files
-
-  //   res.send({
-  //     Camera_Heigh_Of_Installation_Picture:Camera_Heigh_Of_Installation_Picture,
-  //     Recorder_Heigh_Of_Installation_Picture:Recorder_Heigh_Of_Installation_Picture
-  //   })
-
-  //   return
-
-  //   const {
-  //     full_name,
-  //     email,
-  //     phone_number,
-  //     address,
-  //     What_Sector,
-  //     What_Sector_Step_Two,
-  //     What_Comercial_Sector,
-  //     What_Comercial_Other_Info,
-  //     What_Comercial_Postal_Code,
-  //     BedRooms,
-  //     Purpose_Of_Installment,
-  //     Area_of_Concern,
-  //     Security_System,
-  //     CCTV_Equipment,
-  //     Security_Incident,
-  //     Camera,
-  //     Recorder,
-  //     Cable_type,
-  //     Cable_Length,
-  //     Storage_Duration,
-  //     FireAlarm,
-  //     Smart_Lock,
-  //     Security_Lighting,
-  //     Special_Requirement,
-  //     Follow_Method_email,
-  //     Follow_Method_phone,
-  //     Follow_Method_sms,
-  //   } = req.body;
-
-  //   // const {Camera_Heigh_Of_Installation_Picture} = req.files
-  //   console.log("first",Camera)
-  //   return
-  //     // console.log("first",full_name,
-  //     //   email,
-  //     //   phone_number,
-  //     //   address,
-  //     //   What_Sector,
-  //     //   What_Sector_Step_Two,
-  //     //   What_Comercial_Sector,
-  //     //   What_Comercial_Other_Info,
-  //     //   What_Comercial_Postal_Code,
-  //     //   BedRooms,
-  //     //   Purpose_Of_Installment,
-  //     //   Area_of_Concern,
-  //     //   Security_System,
-  //     //   CCTV_Equipment,
-  //     //   Security_Incident,
-  //     //   Camera,
-  //     //   Recorder,
-  //     //   Cable_type,
-  //     //   Cable_Length,
-  //     //   Storage_Duration,
-  //     //   FireAlarm,
-  //     //   Smart_Lock,
-  //     //   Security_Lighting,
-  //     //   Special_Requirement,
-  //     //   Follow_Method_email,
-  //     //   Follow_Method_phone,
-  //     //   Follow_Method_sms,)
-  //         // Parse the Camera array (as it's sent as JSON string)
-
-  //   // Parse the Camera array (as it's sent as JSON string)
-
-  //   try {
-  //     // let imageUrls = {};
-  //     // const {
-  //     //   Camera_Heigh_Of_Installation_Picture,
-  //     //   Recorder_Heigh_Of_Installation_Picture,
-  //     // } = req.files;
-
-  //     // if (Camera_Heigh_Of_Installation_Picture) {
-  //     //   const fileNameWithoutExtension = path.basename(
-  //     //     Camera_Heigh_Of_Installation_Picture[0].originalname,
-  //     //     path.extname(Camera_Heigh_Of_Installation_Picture[0].originalname)
-  //     //   );
-  //     //   imageUrls.Camera_Heigh_Of_Installation_Picture =
-  //     //     await uploadImageToCloudinary(
-  //     //       Camera_Heigh_Of_Installation_Picture[0].buffer,
-  //     //       `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`
-  //     //     );
-  //     // }
-
-  //     // if (Recorder_Heigh_Of_Installation_Picture) {
-  //     //   const fileNameWithoutExtension = path.basename(
-  //     //     Recorder_Heigh_Of_Installation_Picture[0].originalname,
-  //     //     path.extname(Recorder_Heigh_Of_Installation_Picture[0].originalname)
-  //     //   );
-  //     //   imageUrls.Recorder_Heigh_Of_Installation_Picture =
-  //     //     await uploadImageToCloudinary(
-  //     //       Recorder_Heigh_Of_Installation_Picture[0].buffer,
-  //     //       `CCTV_CAMERA/Alarm/${fileNameWithoutExtension}`
-  //     //     );
-  //     // }
-
-  //     const saveCCTV_Instruction = await CCTVModal({
-  //       full_name: full_name,
-  //       email: email,
-  //       phone_number: phone_number,
-  //       address: address,
-  //       What_Sector: What_Sector,
-  //       What_Sector_Step_Two: What_Sector_Step_Two,
-  //       What_Comercial_Sector: What_Comercial_Sector,
-  //       What_Comercial_Other_Info: What_Comercial_Other_Info,
-  //       What_Comercial_Postal_Code: What_Comercial_Postal_Code,
-  //       BedRooms: BedRooms,
-  //       Purpose_Of_Installment: Purpose_Of_Installment,
-  //       Area_of_Concern: Area_of_Concern,
-  //       Security_System: Security_System,
-  //       CCTV_Equipment: CCTV_Equipment,
-  //       Security_Incident: Security_Incident,
-  //       Camera: JSON.parse(Camera),
-  //       // cameraHeightOfInstallation: [6 urls],
-  //       // recorderHeightOfInstallation: [3 urls],
-  //       //Add image of camera installation
-  //       // Camera_Heigh_Of_Installation_Picture:
-  //       //   imageUrls.Camera_Heigh_Of_Installation_Picture,
-  //       // Camera_Heigh_Of_Installation_Text: Camera_Heigh_Of_Installation_Text,
-  //       // Camera_Heigh_Of_Installation_Desc: Camera_Heigh_Of_Installation_Desc,
-  //       Recorder: JSON.parse(Recorder),
-  //       //Add image of Recorder installation
-  //       // Recorder_Heigh_Of_Installation_Picture:
-  //       //   imageUrls.Recorder_Heigh_Of_Installation_Picture,
-  //       // Recorder_Heigh_Of_Installation_Text:
-  //       //   Recorder_Heigh_Of_Installation_Text,
-  //       // Recorder_Heigh_Of_Installation_Desc:
-  //       //   Recorder_Heigh_Of_Installation_Desc,
-  //       Cable_type: Cable_type,
-  //       Cable_Length: Cable_Length,
-  //       Storage_Duration: Storage_Duration,
-  //       FireAlarm: FireAlarm,
-  //       Smart_Lock: Smart_Lock,
-  //       Security_Lighting: Security_Lighting,
-  //       Special_Requirement: Special_Requirement,
-  //       Follow_Method_email: Follow_Method_email,
-  //       Follow_Method_phone: Follow_Method_phone,
-  //       Follow_Method_sms: Follow_Method_sms,
-  //     });
-
-  //     saveCCTV_Instruction
-  //       .save()
-  //       .then(() => {
-  //         res.send({
-  //           success: true,
-  //           message: "Successfully CCTV Created",
-  //           data: saveCCTV_Instruction,
-  //         });
-  //       })
-  //       .catch((e) => {
-  //         res.send({
-  //           success: false,
-  //           message: e.message,
-  //         });
-  //       });
-  //   } catch (err) {
-  //     console.log(err.message);
-  //   }
-  // };
 
   static getCamera = async (req, res) => {
     const {
@@ -676,102 +514,90 @@ class MainController {
     }
   };
 
-  // static generateGraph = async (req, res) => {
-  //   const user_data = req.user;
-  //   // const { type, label, ...otherData } = req.body; // Destructure other data
-  //   const {type, label } = req.body;
 
-    
-
-  //   try {
-  //     // Check for existing label based on type and date
-  //     const existingGraph = await (type === "CCTV"
-  //       ? Graph_Modal
-  //       : Graph_Alarm
-  //     ).findOne({
-  //       user_id: user_data._id,
-  //       label,
-  //     });
-    
-  //     if (existingGraph) {
-
-  //       // console.log("existingGraph", existingGraph)
-  //       // return
-  //       // Update existing graph value by 1
-  //       existingGraph.value++;
-  //       await existingGraph.save();
-
-  //       // console.log(`Updated existing ${type} graph with label: ${label}`);
-  //     } else {
-  //       // Create a new graph
-  //       const newGraph = new (type === "CCTV" ? Graph_Modal : Graph_Alarm)({
-  //         user_id: user_data._id,
-  //         type: type, // Spread remaining data
-  //         label: label,
-  //         value: 1
-  //       });
-
-  //       const saved = await newGraph.save();
-
-  //       // console.log(`Created new ${type} graph with label: ${label}`);
-  //     }
-
-  //     res.send({
-  //       success: true,
-  //       message: `Graph(s) generated successfully!`,
-  //     });
-  //   } catch (error) {
-  //     console.error(error);
-  //     res.status(500).send({ success: false, error: error.message });
-  //   }
-  // };
-
-
-  static generateGraph = async (req, res) => {
-    const user_data = req.user;
-    const { type, label } = req.body;
+  static generateGraph = async (id, type) => {
+    const label = moment().format('MMM D');
   
+    console.log("Generating graph for date label:", label);
     try {
-      // Check for existing graph based on type and label
-      const existingGraph = await (type === "CCTV" ? Graph_Modal : Graph_Alarm).findOne({
-        user_id: user_data._id,
+      const graphModel = type === "CCTV" ? Graph_Modal : Graph_Alarm;
+      
+      // Check for existing graph
+      const existingGraph = await graphModel.findOne({
+        user_id: id,
         label,
       });
   
       if (existingGraph) {
-        // Update existing graph value by 1
         existingGraph.value++;
         await existingGraph.save();
-  
-        // Return response and stop further execution
-        return res.send({
-          success: true,
-          message: `Graph updated successfully!`,
-        });
+        return { success: true, message: `Graph updated successfully!` };
       } else {
-        // Create a new graph
-        const newGraph = new (type === "CCTV" ? Graph_Modal : Graph_Alarm)({
-          user_id: user_data._id,
-          type: type,
-          label: label,
+        const newGraph = new graphModel({
+          user_id: id,
+          type,
+          label,
           value: 1,
         });
   
-        const saved = await newGraph.save();
-  
-        // Return response for new graph and stop further execution
-        return res.send({
-          success: true,
-          message: `New graph created successfully!`,
-          data: saved,
-        });
+        const savedGraph = await newGraph.save();
+        return { success: true, message: `New graph created successfully!`, data: savedGraph };
       }
     } catch (error) {
       console.error(error);
-      // Send error response
-      return res.status(500).send({ success: false, error: error.message });
+      return { success: false, error: error.message };
     }
   };
+  
+
+  // static generateGraph = async (req, res) => {
+
+
+  //   return
+  //   const user_data = req.user;
+  //   const { type, label } = req.body;
+  
+  //   try {
+  //     // Check for existing graph based on type and label
+  //     const existingGraph = await (type === "CCTV" ? Graph_Modal : Graph_Alarm).findOne({
+  //       user_id: user_data._id,
+  //       label,
+  //     });
+  
+  //     if (existingGraph) {
+  //       // Update existing graph value by 1
+  //       existingGraph.value++;
+  //       await existingGraph.save();
+  
+  //       // Return response and stop further execution
+  //       return res.send({
+  //         success: true,
+  //         message: `Graph updated successfully!`,
+  //       });
+  //     } else {
+  //       // Create a new graph
+  //       const newGraph = new (type === "CCTV" ? Graph_Modal : Graph_Alarm)({
+  //         user_id: user_data._id,
+  //         type: type,
+  //         label: label,
+  //         value: 1,
+  //       });
+  
+  //       const saved = await newGraph.save();
+  
+  //       // Return response for new graph and stop further execution
+  //       return res.send({
+  //         success: true,
+  //         message: `New graph created successfully!`,
+  //         data: saved,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     // Send error response
+  //     return res.status(500).send({ success: false, error: error.message });
+  //   }
+  // };
 
   
   static ChangePassword = async (req, res) => {
@@ -893,32 +719,45 @@ class MainController {
     });
   };
 
-  //delete if it's doesnnt work
-  static genPdf = async (req, res) => {
-    try {
-      let options = { format: "A4" };
-      let file = { content: "<h1>Welcome to html-pdf-node</h1>" };
-      // or //
-      const pdfBuffer = await html_to_pdf.generatePdf(file, options);
+  static getGraph = async(req, res) => {
+    const userData = req.user
+    const Graph_Alarm_Var = await Graph_Alarm.find({user_id : userData._id})
+    const Graph_Modal_Var = await Graph_Modal.find({user_id : userData._id})
 
-      const fileName = "example-pdf"; // You might want to use a unique name or derive it from the request
-      const uploadResult = await this.uploadPDFToCloudinary(
-        pdfBuffer,
-        fileName
-      );
+    console.log("first",Graph_Alarm_Var, "........", Graph_Modal_Var)
 
-      res.status(200).json({
-        success: true,
-        message: "PDF uploaded successfully",
-        url: uploadResult.secure_url,
-      });
-    } catch (error) {
-      res.send({
-        error: true,
-        message: error.message,
-      });
-    }
-  };
+    res.send({
+      "Graph_Alarm_Var": [...Graph_Alarm_Var, ...Graph_Modal_Var],
+      // "Graph_Modal_Var": Graph_Modal_Var,
+    })
+  }
+
+  // //delete if it's doesnnt work
+  // static genPdf = async (req, res) => {
+  //   try {
+  //     let options = { format: "A4" };
+  //     let file = { content: "<h1>Welcome to html-pdf-node</h1>" };
+  //     // or //
+  //     const pdfBuffer = await html_to_pdf.generatePdf(file, options);
+
+  //     const fileName = "example-pdf"; // You might want to use a unique name or derive it from the request
+  //     const uploadResult = await this.uploadPDFToCloudinary(
+  //       pdfBuffer,
+  //       fileName
+  //     );
+
+  //     res.status(200).json({
+  //       success: true,
+  //       message: "PDF uploaded successfully",
+  //       url: uploadResult.secure_url,
+  //     });
+  //   } catch (error) {
+  //     res.send({
+  //       error: true,
+  //       message: error.message,
+  //     });
+  //   }
+  // };
 }
 
 module.exports = MainController;
