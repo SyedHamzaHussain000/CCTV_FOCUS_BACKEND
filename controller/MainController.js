@@ -114,7 +114,7 @@ class MainController {
 
       const graphResult = await this.generateGraph(userData._id, "Alarm");
 
-      console.log("graphResult",graphResult)
+
 
       const saveAlarmInstruction = await AlarmModal({
         report_generator_id: userData._id,
@@ -220,7 +220,17 @@ class MainController {
     const {
       Camera_Heigh_Of_Installation_Picture,
       Recorder_Heigh_Of_Installation_Picture,
+     
     } = req.files;
+
+    console.log("req", req.body)
+    // res.send({
+    //   data: req.body
+    // })
+    // return
+
+
+    
     const userData = req.user;
 
     try {
@@ -298,18 +308,56 @@ class MainController {
         full_name: req.body.full_name,
         email: req.body.email,
         phone_number: req.body.phone_number,
-        address: req.body.address,
+        lineofaddr: req.body.lineofaddr,
+        secondlineofaddr: req.body.secondlineofaddr,
+        town: req.body.town,
+        PostalCode: req.body.PostalCode,
         What_Sector: req.body.What_Sector,
         What_Sector_Step_Two: req.body.What_Sector_Step_Two,
         What_Comercial_Sector: req.body.What_Comercial_Sector,
         What_Comercial_Other_Info: req.body.What_Comercial_Other_Info,
-        What_Comercial_Postal_Code: req.body.What_Comercial_Postal_Code,
         BedRooms: req.body.BedRooms,
-        Purpose_Of_Installment: req.body.Purpose_Of_Installment,
-        Area_of_Concern: req.body.Area_of_Concern,
-        Security_System: req.body.Security_System,
-        CCTV_Equipment: req.body.CCTV_Equipment,
-        Security_Incident: req.body.Security_Incident,
+        CCTV_purpose: req.body.CCTV_purpose,
+        ExistingCCTV: req.body.ExistingCCTV,
+
+        ExistingCCTVTxt: req.body.ExistingCCTVTxt,
+        CCTV_Analougeorip: req.body.CCTV_Analougeorip,
+        CCTV_RecorderInfo_Channel: req.body.CCTV_RecorderInfo_Channel,
+        CCTV_RecorderInfo_Resolution: req.body.CCTV_RecorderInfo_Resolution,
+        CCTV_RecorderInfo_AnalyticsFeature: req.body.CCTV_RecorderInfo_AnalyticsFeature,
+        CCTV_RecorderInfo_AudioSupport: req.body.CCTV_RecorderInfo_AudioSupport,
+        CCTV_RecorderInfo_Storage: req.body.CCTV_RecorderInfo_Storage,
+
+        CCTV_Cable_Type: req.body.CCTV_Cable_Type,
+        CCTV_Enter_Length: req.body.CCTV_Enter_Length,
+        CCTV_Cable_Cat5_Type: req.body.CCTV_Cable_Cat5_Type,
+        CCTV_Cable_Cat5_Colour: req.body.CCTV_Cable_Cat5_Colour,
+        CCTV_Enter_Cat5_Length: req.body.CCTV_Enter_Cat5_Length,
+        CCTV_Cable_Cat6_Type: req.body.CCTV_Cable_Cat6_Type,
+
+        CCTV_Cable_Cat6_Colour: req.body.CCTV_Cable_Cat6_Colour,
+        CCTV_Enter_Cat6_Length: req.body.CCTV_Enter_Cat6_Length,
+        CCTV_Cable_RJ59_Type: req.body.CCTV_Cable_RJ59_Type,
+        CCTV_Enter_RJ59_Length: req.body.CCTV_Enter_RJ59_Length,
+
+        CCTV_ConnectToMobile: req.body.CCTV_ConnectToMobile,
+        CCTV_ConnectCurrentTV: req.body.CCTV_ConnectCurrentTV,
+        CCTV_RecorderInMeter: req.body.CCTV_RecorderInMeter,
+        CCTV_Extender_Required: req.body.CCTV_Extender_Required,
+
+        CCTV_NewScreen: req.body.CCTV_NewScreen,
+        CCTV_WhatSize: req.body.CCTV_WhatSize,
+        CCTV_WallBracket: req.body.CCTV_WallBracket,
+        CCTV_Supplying: req.body.CCTV_Supplying,
+
+        FireAlarm: req.body.FireAlarm,
+        Smart_Lock: req.body.Smart_Lock,
+        Security_Lighting: req.body.Security_Lighting,
+        Special_Requirement: req.body.Special_Requirement,
+        Follow_Method_email: req.body.Follow_Method_email,
+        Follow_Method_phone: req.body.Follow_Method_phone,
+        Follow_Method_sms: req.body.Follow_Method_sms,
+
         Camera: parsedCamera,
         cameraHeightOfInstallationImages: cameraImageUrls.filter(
           (url) => url !== null
@@ -318,110 +366,174 @@ class MainController {
         recorderHeightOfInstallationImages: recorderImageUrls.filter(
           (url) => url !== null
         ),
-        Cable_type: req.body.Cable_type,
-        Cable_Length: req.body.Cable_Length,
-        Storage_Duration: req.body.Storage_Duration,
-        FireAlarm: req.body.FireAlarm,
-        Smart_Lock: req.body.Smart_Lock,
-        Security_Lighting: req.body.Security_Lighting,
-        Special_Requirement: req.body.Special_Requirement,
-        Follow_Method_email: req.body.Follow_Method_email,
-        Follow_Method_phone: req.body.Follow_Method_phone,
-        Follow_Method_sms: req.body.Follow_Method_sms,
+
       });
 
       await saveCCTV_Instruction.save();
       const htmlContent = `
-        <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; }
-            h1 { color: blue; }
-            p { margin: 5px 0; }
-          </style>
-        </head>
-        <body>
-          <h1>CCTV Instruction</h1>
-          <p><strong>Full Name:</strong> ${req.body.full_name}</p>
-          <p><strong>Email:</strong> ${req.body.email}</p>
-          <p><strong>Phone Number:</strong> ${req.body.phone_number}</p>
-          <p><strong>Address:</strong> ${req.body.address}</p>
-          <p><strong>What Sector:</strong> ${req.body.What_Sector}</p>
-          <p><strong>What Sector Step Two:</strong> ${
-            req.body.What_Sector_Step_Two
-          }</p>
-          <p><strong>What Comercial Sector:</strong> ${
-            req.body.What_Comercial_Sector
-          }</p>
-          <p><strong>What Comercial Other Info:</strong> ${
-            req.body.What_Comercial_Other_Info
-          }</p>
-          <p><strong>What Comercial Postal Code:</strong> ${
-            req.body.What_Comercial_Postal_Code
-          }</p>
-          <p><strong>Bedrooms:</strong> ${req.body.BedRooms}</p>
-          <p><strong>Purpose of Installment:</strong> ${
-            req.body.Purpose_Of_Installment
-          }</p>
-          <p><strong>Area of Concern:</strong> ${req.body.Area_of_Concern}</p>
-          <p><strong>Security System:</strong> ${req.body.Security_System}</p>
-          <p><strong>CCTV Equipment:</strong> ${req.body.CCTV_Equipment}</p>
-          <p><strong>Security Incident:</strong> ${
-            req.body.Security_Incident
-          }</p>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    h1 { color: blue; }
+    p { margin: 5px 0; }
+    img { max-width: 300px; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <h1>CCTV Instruction</h1>
+  <p><strong>Full Name:</strong> ${req.body.full_name}</p>
+  <p><strong>Email:</strong> ${req.body.email}</p>
+  <p><strong>Phone Number:</strong> ${req.body.phone_number}</p>
+  <p><strong>Address Line 1:</strong> ${req.body.lineofaddr}</p>
+  <p><strong>Address Line 2:</strong> ${req.body.secondlineofaddr}</p>
+  <p><strong>Town:</strong> ${req.body.town}</p>
+  <p><strong>Postal Code:</strong> ${req.body.PostalCode}</p>
+  <p><strong>What Sector:</strong> ${req.body.What_Sector}</p>
+  <p><strong>What Sector Step Two:</strong> ${req.body.What_Sector_Step_Two}</p>
+  <p><strong>What Commercial Sector:</strong> ${req.body.What_Comercial_Sector}</p>
+  <p><strong>What Commercial Other Info:</strong> ${req.body.What_Comercial_Other_Info}</p>
+  <p><strong>Bedrooms:</strong> ${req.body.BedRooms}</p>
+  <p><strong>CCTV Purpose:</strong> ${req.body.CCTV_purpose}</p>
+  <p><strong>Existing CCTV:</strong> ${req.body.ExistingCCTV}</p>
+  <p><strong>Existing CCTV Text:</strong> ${req.body.ExistingCCTVTxt}</p>
+  <p><strong>CCTV Analogue/IP:</strong> ${req.body.CCTV_Analougeorip}</p>
+  <p><strong>Recorder Channels:</strong> ${req.body.CCTV_RecorderInfo_Channel}</p>
+  <p><strong>Recorder Resolution:</strong> ${req.body.CCTV_RecorderInfo_Resolution}</p>
+  <p><strong>Recorder Analytics Feature:</strong> ${req.body.CCTV_RecorderInfo_AnalyticsFeature}</p>
+  <p><strong>Recorder Audio Support:</strong> ${req.body.CCTV_RecorderInfo_AudioSupport}</p>
+  <p><strong>Recorder Storage:</strong> ${req.body.CCTV_RecorderInfo_Storage}</p>
+  <p><strong>Cable Type:</strong> ${req.body.CCTV_Cable_Type}</p>
+  <p><strong>Cable Length:</strong> ${req.body.CCTV_Enter_Length}</p>
+  <p><strong>Cat5 Cable Type:</strong> ${req.body.CCTV_Cable_Cat5_Type}</p>
+  <p><strong>Cat5 Cable Colour:</strong> ${req.body.CCTV_Cable_Cat5_Colour}</p>
+  <p><strong>Cat5 Cable Length:</strong> ${req.body.CCTV_Enter_Cat5_Length}</p>
+  <p><strong>Cat6 Cable Type:</strong> ${req.body.CCTV_Cable_Cat6_Type}</p>
+  <p><strong>Cat6 Cable Colour:</strong> ${req.body.CCTV_Cable_Cat6_Colour}</p>
+  <p><strong>Cat6 Cable Length:</strong> ${req.body.CCTV_Enter_Cat6_Length}</p>
+  <p><strong>RG59 Cable Type:</strong> ${req.body.CCTV_Cable_RJ59_Type}</p>
+  <p><strong>RG59 Cable Length:</strong> ${req.body.CCTV_Enter_RJ59_Length}</p>
+  <p><strong>Connect to Mobile:</strong> ${req.body.CCTV_ConnectToMobile}</p>
+  <p><strong>Connect Current TV:</strong> ${req.body.CCTV_ConnectCurrentTV}</p>
+  <p><strong>Recorder Placement Distance:</strong> ${req.body.CCTV_RecorderInMeter}</p>
+  <p><strong>Extender Required:</strong> ${req.body.CCTV_Extender_Required}</p>
+  <p><strong>New Screen:</strong> ${req.body.CCTV_NewScreen}</p>
+  <p><strong>Screen Size:</strong> ${req.body.CCTV_WhatSize}</p>
+  <p><strong>Wall Bracket:</strong> ${req.body.CCTV_WallBracket}</p>
+  <p><strong>Supplying:</strong> ${req.body.CCTV_Supplying}</p>
+  <p><strong>Fire Alarm:</strong> ${req.body.FireAlarm}</p>
+  <p><strong>Smart Lock:</strong> ${req.body.Smart_Lock}</p>
+  <p><strong>Security Lighting:</strong> ${req.body.Security_Lighting}</p>
+  <p><strong>Special Requirement:</strong> ${req.body.Special_Requirement}</p>
+  <p><strong>Follow-up by Email:</strong> ${req.body.Follow_Method_email}</p>
+  <p><strong>Follow-up by Phone:</strong> ${req.body.Follow_Method_phone}</p>
+  <p><strong>Follow-up by SMS:</strong> ${req.body.Follow_Method_sms}</p>
+  
+  <h2>Camera Details</h2>
+  <p><strong>Camera:</strong> ${JSON.stringify(parsedCamera, null, 2)}</p>
+  <p><strong>Camera Height of Installation Images:</strong></p>
+  ${cameraImageUrls.map((url) => `<img src="${url}" alt="Camera Image">`).join('')}
+  
+  <h2>Recorder Details</h2>
+  <p><strong>Recorder:</strong> ${JSON.stringify(parsedRecorder, null, 2)}</p>
+  <p><strong>Recorder Height of Installation Images:</strong></p>
+  ${recorderImageUrls.map((url) => `<img src="${url}" alt="Recorder Image">`).join('')}
+</body>
+</html>
+`;
+
+
+      // const htmlContent = `
+      //   <html>
+      //   <head>
+      //     <style>
+      //       body { font-family: Arial, sans-serif; }
+      //       h1 { color: blue; }
+      //       p { margin: 5px 0; }
+      //     </style>
+      //   </head>
+      //   <body>
+      //     <h1>CCTV Instruction</h1>
+      //     <p><strong>Full Name:</strong> ${req.body.full_name}</p>
+      //     <p><strong>Email:</strong> ${req.body.email}</p>
+      //     <p><strong>Phone Number:</strong> ${req.body.phone_number}</p>
+      //     <p><strong>Address:</strong> ${req.body.address}</p>
+      //     <p><strong>What Sector:</strong> ${req.body.What_Sector}</p>
+      //     <p><strong>What Sector Step Two:</strong> ${
+      //       req.body.What_Sector_Step_Two
+      //     }</p>
+      //     <p><strong>What Comercial Sector:</strong> ${
+      //       req.body.What_Comercial_Sector
+      //     }</p>
+      //     <p><strong>What Comercial Other Info:</strong> ${
+      //       req.body.What_Comercial_Other_Info
+      //     }</p>
+      //     <p><strong>What Comercial Postal Code:</strong> ${
+      //       req.body.What_Comercial_Postal_Code
+      //     }</p>
+      //     <p><strong>Bedrooms:</strong> ${req.body.BedRooms}</p>
+      //     <p><strong>Purpose of Installment:</strong> ${
+      //       req.body.Purpose_Of_Installment
+      //     }</p>
+      //     <p><strong>Area of Concern:</strong> ${req.body.Area_of_Concern}</p>
+      //     <p><strong>Security System:</strong> ${req.body.Security_System}</p>
+      //     <p><strong>CCTV Equipment:</strong> ${req.body.CCTV_Equipment}</p>
+      //     <p><strong>Security Incident:</strong> ${
+      //       req.body.Security_Incident
+      //     }</p>
           
-          <h2>Camera Details</h2>
-          <p><strong>Camera:</strong> ${JSON.stringify(
-            parsedCamera,
-            null,
-            2
-          )}</p>
-          <p><strong>Camera Height Of Installation Images:</strong></p>
-          ${cameraImageUrls
-            .map(
-              (url) =>
-                `<img src="${url}" alt="Camera Image" style="max-width: 300px; margin-bottom: 10px;">`
-            )
-            .join("")}
+      //     <h2>Camera Details</h2>
+      //     <p><strong>Camera:</strong> ${JSON.stringify(
+      //       parsedCamera,
+      //       null,
+      //       2
+      //     )}</p>
+      //     <p><strong>Camera Height Of Installation Images:</strong></p>
+      //     ${cameraImageUrls
+      //       .map(
+      //         (url) =>
+      //           `<img src="${url}" alt="Camera Image" style="max-width: 300px; margin-bottom: 10px;">`
+      //       )
+      //       .join("")}
           
-          <h2>Recorder Details</h2>
-          <p><strong>Recorder:</strong> ${JSON.stringify(
-            parsedRecorder,
-            null,
-            2
-          )}</p>
-          <p><strong>Recorder Height Of Installation Images:</strong></p>
-          ${recorderImageUrls
-            .map(
-              (url) =>
-                `<img src="${url}" alt="Recorder Image" style="max-width: 300px; margin-bottom: 10px;">`
-            )
-            .join("")}
+      //     <h2>Recorder Details</h2>
+      //     <p><strong>Recorder:</strong> ${JSON.stringify(
+      //       parsedRecorder,
+      //       null,
+      //       2
+      //     )}</p>
+      //     <p><strong>Recorder Height Of Installation Images:</strong></p>
+      //     ${recorderImageUrls
+      //       .map(
+      //         (url) =>
+      //           `<img src="${url}" alt="Recorder Image" style="max-width: 300px; margin-bottom: 10px;">`
+      //       )
+      //       .join("")}
           
           
-          <p><strong>Cable Type:</strong> ${req.body.Cable_type}</p>
-          <p><strong>Cable Length:</strong> ${req.body.Cable_Length}</p>
-          <p><strong>Storage Duration:</strong> ${req.body.Storage_Duration}</p>
-          <p><strong>Fire Alarm:</strong> ${req.body.FireAlarm}</p>
-          <p><strong>Smart Lock:</strong> ${req.body.Smart_Lock}</p>
-          <p><strong>Security Lighting:</strong> ${
-            req.body.Security_Lighting
-          }</p>
-          <p><strong>Special Requirement:</strong> ${
-            req.body.Special_Requirement
-          }</p>
-          <p><strong>Follow Method Email:</strong> ${
-            req.body.Follow_Method_email
-          }</p>
-          <p><strong>Follow Method Phone:</strong> ${
-            req.body.Follow_Method_phone
-          }</p>
-          <p><strong>Follow Method SMS:</strong> ${
-            req.body.Follow_Method_sms
-          }</p>
-        </body>
-        </html>
-        `;
+      //     <p><strong>Cable Type:</strong> ${req.body.Cable_type}</p>
+      //     <p><strong>Cable Length:</strong> ${req.body.Cable_Length}</p>
+      //     <p><strong>Storage Duration:</strong> ${req.body.Storage_Duration}</p>
+      //     <p><strong>Fire Alarm:</strong> ${req.body.FireAlarm}</p>
+      //     <p><strong>Smart Lock:</strong> ${req.body.Smart_Lock}</p>
+      //     <p><strong>Security Lighting:</strong> ${
+      //       req.body.Security_Lighting
+      //     }</p>
+      //     <p><strong>Special Requirement:</strong> ${
+      //       req.body.Special_Requirement
+      //     }</p>
+      //     <p><strong>Follow Method Email:</strong> ${
+      //       req.body.Follow_Method_email
+      //     }</p>
+      //     <p><strong>Follow Method Phone:</strong> ${
+      //       req.body.Follow_Method_phone
+      //     }</p>
+      //     <p><strong>Follow Method SMS:</strong> ${
+      //       req.body.Follow_Method_sms
+      //     }</p>
+      //   </body>
+      //   </html>
+      //   `;
 
       const filename = `Alarm_pdf${Date.now()}`;
       // Generate the PDF from the HTML
